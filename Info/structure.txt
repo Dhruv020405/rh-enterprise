@@ -1,0 +1,71 @@
+rh-enterprise/
+│
+├── index.php
+├── category.php
+├── product.php
+├── contact.php
+├── search.php
+│
+├── config/
+│   └── database.php
+│
+├── includes/
+│   ├── header.php
+│   ├── footer.php
+│   ├── navbar.php
+│   ├── functions.php
+│   └── helpers.php
+│
+├── controllers/
+│   ├── CategoryController.php
+│   ├── ProductController.php
+│   └── InquiryController.php
+│
+├── admin/
+│   ├── index.php
+│   ├── login.php
+│   ├── logout.php
+│   ├── dashboard.php
+│   │
+│   ├── categories/
+│   │   ├── index.php
+│   │   ├── add.php
+│   │   ├── edit.php
+│   │   └── delete.php
+│   │
+│   ├── products/
+│   │   ├── index.php
+│   │   ├── add.php
+│   │   ├── edit.php
+│   │   └── delete.php
+│   │
+│   └── inquiries/
+│       └── index.php
+│
+├── assets/
+│   ├── css/
+│   │   ├── bootstrap.min.css
+│   │   └── style.css
+│   │
+│   ├── js/
+│   │   ├── bootstrap.bundle.min.js
+│   │   └── main.js
+│   │
+│   ├── images/
+│   │   ├── logo/
+│   │   └── static/
+│   │
+│   └── icons/
+│
+├── uploads/
+│   ├── categories/
+│   ├── products/
+│   └── gallery/
+│
+├── storage/
+│   └── logs/
+│
+├── database/
+│   └── rh_enterprise.sql
+│
+└── .htaccess

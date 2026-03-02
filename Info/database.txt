@@ -1,0 +1,129 @@
+-- =========================================
+-- CREATE DATABASE
+-- =========================================
+
+CREATE DATABASE IF NOT EXISTS rh_enterprise;
+USE rh_enterprise;
+
+-- =========================================
+-- ADMIN USERS
+-- =========================================
+
+CREATE TABLE admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =========================================
+-- CATEGORIES (SELF REFERENCING HIERARCHY)
+-- =========================================
+
+CREATE TABLE categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    parent_id INT NULL,
+    name VARCHAR(150) NOT NULL,
+    slug VARCHAR(150) UNIQUE,
+    image VARCHAR(255) NULL,
+    status TINYINT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (parent_id)
+        REFERENCES categories(id)
+        ON DELETE CASCADE
+);
+
+-- =========================================
+-- PRODUCTS (FINAL LEVEL ITEMS)
+-- =========================================
+
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    name VARCHAR(200) NOT NULL,
+    slug VARCHAR(200) UNIQUE,
+    short_description TEXT,
+    description LONGTEXT,
+    main_image VARCHAR(255),
+    status TINYINT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (category_id)
+        REFERENCES categories(id)
+        ON DELETE CASCADE
+);
+
+-- =========================================
+-- PRODUCT MULTIPLE IMAGES
+-- =========================================
+
+CREATE TABLE product_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    image VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (product_id)
+        REFERENCES products(id)
+        ON DELETE CASCADE
+);
+
+-- =========================================
+-- PRODUCT FEATURES (Advantages / Specs)
+-- =========================================
+
+CREATE TABLE product_features (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    feature_text VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (product_id)
+        REFERENCES products(id)
+        ON DELETE CASCADE
+);
+
+-- =========================================
+-- PRODUCT APPLICATIONS
+-- =========================================
+
+CREATE TABLE product_applications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NOT NULL,
+    application_text VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (product_id)
+        REFERENCES products(id)
+        ON DELETE CASCADE
+);
+
+-- =========================================
+-- INQUIRY TABLE
+-- =========================================
+
+CREATE TABLE inquiries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    product_id INT NULL,
+    name VARCHAR(150) NOT NULL,
+    company_name VARCHAR(150),
+    phone VARCHAR(20),
+    email VARCHAR(150),
+    message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (product_id)
+        REFERENCES products(id)
+        ON DELETE SET NULL
+);
+
+-- =========================================
+-- INDEXES FOR PERFORMANCE
+-- =========================================
+
+CREATE INDEX idx_category_parent ON categories(parent_id);
+CREATE INDEX idx_category_slug ON categories(slug);
+CREATE INDEX idx_product_slug ON products(slug);
+CREATE INDEX idx_product_category ON products(category_id);

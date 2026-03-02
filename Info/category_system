@@ -1,0 +1,176 @@
+=========================================
+RH ENTERPRISE - SMART CATEGORY LOGIC
+=========================================
+
+PURPOSE:
+--------
+Category page automatically decide karega ki:
+- Subcategory dikhani hai
+- Product listing dikhani hai
+- Ya direct product page open karna hai
+
+-----------------------------------------
+MAIN DECISION FLOW
+-----------------------------------------
+
+STEP 1:
+Check karo — kya is category ke andar subcategories hain?
+
+IF subcategories exist:
+    → Show subcategories (category view)
+
+ELSE:
+    → Check products inside category
+
+        IF exactly 1 product:
+            → Redirect to product detail page
+
+        IF more than 1 product:
+            → Show product listing grid
+
+        IF no product:
+            → Show "No subcategories or products found"
+
+-----------------------------------------
+PSEUDO CODE
+-----------------------------------------
+
+IF has_subcategories:
+    show_subcategories()
+
+ELSE:
+    IF product_count == 1:
+        redirect_to_product()
+
+    ELSE IF product_count > 1:
+        show_product_listing()
+
+    ELSE:
+        show_empty_message()
+
+-----------------------------------------
+WHY THIS LOGIC IS IMPORTANT
+-----------------------------------------
+
+• Unlimited category depth supported
+• Mixed structure supported (category + product)
+• No useless empty pages
+• Better user experience
+• Professional CMS architecture
+• Works like Amazon / Flipkart category structure
+
+-----------------------------------------
+EXAMPLE STRUCTURE
+-----------------------------------------
+
+TATA
+ ├── Clothing
+ │     ├── Jeans (Product)
+ │     └── Pants (Product)
+ │
+ └── Motors
+       ├── Car
+       │     ├── Nexon (Product)
+       │     └── Safari (Product)
+       │
+       └── Truck
+
+Flow Behaviour:
+
+TATA → Show Clothing & Motors
+Clothing → Show Jeans & Pants
+Motors → Show Car & Truck
+Car → Show Nexon & Safari
+Truck → 
+    IF 1 product → direct open product page
+    IF multiple → show listing
+    IF none → show empty message
+
+
+=========================================
+RH ENTERPRISE - SMART CATEGORY LOGIC
+=========================================
+
+PURPOSE:
+--------
+Category page automatically decide karega ki:
+- Subcategory dikhani hai
+- Product listing dikhani hai
+- Ya direct product page open karna hai
+
+-----------------------------------------
+MAIN DECISION FLOW
+-----------------------------------------
+
+STEP 1:
+Check karo — kya is category ke andar subcategories hain?
+
+IF subcategories exist:
+    → Show subcategories (category view)
+
+ELSE:
+    → Check products inside category
+
+        IF exactly 1 product:
+            → Redirect to product detail page
+
+        IF more than 1 product:
+            → Show product listing grid
+
+        IF no product:
+            → Show "No subcategories or products found"
+
+-----------------------------------------
+PSEUDO CODE
+-----------------------------------------
+
+IF has_subcategories:
+    show_subcategories()
+
+ELSE:
+    IF product_count == 1:
+        redirect_to_product()
+
+    ELSE IF product_count > 1:
+        show_product_listing()
+
+    ELSE:
+        show_empty_message()
+
+-----------------------------------------
+WHY THIS LOGIC IS IMPORTANT
+-----------------------------------------
+
+• Unlimited category depth supported
+• Mixed structure supported (category + product)
+• No useless empty pages
+• Better user experience
+• Professional CMS architecture
+• Works like Amazon / Flipkart category structure
+
+-----------------------------------------
+EXAMPLE STRUCTURE
+-----------------------------------------
+
+TATA
+ ├── Clothing
+ │     ├── Jeans (Product)
+ │     └── Pants (Product)
+ │
+ └── Motors
+       ├── Car
+       │     ├── Nexon (Product)
+       │     └── Safari (Product)
+       │
+       └── Truck
+
+Flow Behaviour:
+
+TATA → Show Clothing & Motors
+Clothing → Show Jeans & Pants
+Motors → Show Car & Truck
+Car → Show Nexon & Safari
+Truck → 
+    IF 1 product → direct open product page
+    IF multiple → show listing
+    IF none → show empty message
