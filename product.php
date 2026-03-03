@@ -60,6 +60,24 @@ function getCategoryPath($category_id) {
     return array_reverse($path);
 }
 
+/* ==========================
+   RELATED PRODUCTS
+========================== */
+
+$stmtRelated = $conn->prepare("
+    SELECT id, name, slug, main_image 
+    FROM products 
+    WHERE category_id = ? 
+    AND id != ? 
+    AND status = 1
+    ORDER BY id DESC
+    LIMIT 4
+");
+
+$stmtRelated->bind_param("ii", $product['category_id'], $product['id']);
+$stmtRelated->execute();
+$relatedProducts = $stmtRelated->get_result();
+
 include "includes/header.php";
 include "includes/navbar.php";
 ?>
