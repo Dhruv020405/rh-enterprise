@@ -272,11 +272,10 @@ include "includes/navbar.php";
             </div>
 
             <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
-                <a href="contact.php?product=<?= urlencode($product['name']); ?>"
-                   class="btn btn-danger btn-lg px-5 shadow-sm fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/></svg>
-                    Request Inquiry
-                </a>
+                <a href="inquiry.php?product_id=<?= $product['id']; ?>" 
+   class="btn btn-danger mt-3">
+   Request Inquiry
+</a>
                 <a href="uploads/brochures/placeholder.pdf" target="_blank" class="btn btn-outline-dark btn-lg px-4 shadow-sm fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
                     Datasheet
@@ -316,5 +315,42 @@ include "includes/navbar.php";
 
     </div>
 </div>
+<?php if($relatedProducts->num_rows > 0): ?>
 
+<hr class="my-5">
+
+<h4 class="mb-4">Related Products</h4>
+
+<div class="row">
+
+<?php while($rel = $relatedProducts->fetch_assoc()): ?>
+
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100">
+
+            <?php if(!empty($rel['main_image'])): ?>
+                <img src="uploads/products/<?= $rel['main_image']; ?>" 
+                     class="card-img-top"
+                     style="height:180px; object-fit:cover;">
+            <?php endif; ?>
+
+            <div class="card-body text-center">
+
+                <h6><?= htmlspecialchars($rel['name']); ?></h6>
+
+                <a href="product.php?slug=<?= $rel['slug']; ?>" 
+                   class="btn btn-danger btn-sm mt-2">
+                   View Product
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+
+<?php endwhile; ?>
+
+</div>
+
+<?php endif; ?>
 <?php include "includes/footer.php"; ?>

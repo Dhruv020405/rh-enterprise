@@ -6,9 +6,17 @@ function displayCategories($parent_id = NULL, $level = 0) {
     global $conn;
 
     if ($parent_id === NULL) {
-        $stmt = $conn->prepare("SELECT * FROM categories WHERE parent_id IS NULL ORDER BY name ASC");
+        $stmt = $conn->prepare("
+            SELECT * FROM categories 
+            WHERE parent_id IS NULL 
+            ORDER BY sort_order ASC, name ASC
+        ");
     } else {
-        $stmt = $conn->prepare("SELECT * FROM categories WHERE parent_id = ? ORDER BY name ASC");
+        $stmt = $conn->prepare("
+            SELECT * FROM categories 
+            WHERE parent_id = ? 
+            ORDER BY sort_order ASC, name ASC
+        ");
         $stmt->bind_param("i", $parent_id);
     }
 
@@ -17,10 +25,12 @@ function displayCategories($parent_id = NULL, $level = 0) {
 
     while ($row = $result->fetch_assoc()) {
 
-        echo "<tr>";
+        echo "<tr data-id='{$row['id']}'>";
 
-        // Category Name with indentation
-        echo "<td>" . str_repeat("— ", $level) . htmlspecialchars($row['name']) . "</td>";
+        // Drag Handle + Name
+        echo "<td style='cursor:move;'>";
+        echo "☰ " . str_repeat("— ", $level) . htmlspecialchars($row['name']);
+        echo "</td>";
 
         // Image
         echo "<td>";
@@ -85,12 +95,37 @@ function displayCategories($parent_id = NULL, $level = 0) {
             </tr>
         </thead>
 
-        <tbody>
+        <tbody id="sortable-categories">
             <?php displayCategories(); ?>
         </tbody>
     </table>
 
 </div>
+
+<!-- Sortable JS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<script>
+let sortable = new Sortable(document.getElementById('sortable-categories'), {
+    animation: 150,
+    onEnd: function () {
+
+        let order = [];
+        document.querySelectorAll('#sortable-categories tr').forEach((row, index) => {
+            order.push({
+                id: row.dataset.id,
+                position: index + 1
+            });
+        });
+
+        fetch('update-order.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+        });
+    }
+});
+</script>
 
 </body>
 </html>

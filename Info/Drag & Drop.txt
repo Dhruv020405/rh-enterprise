@@ -1,0 +1,157 @@
+=================================================
+RH ENTERPRISE - DRAG & DROP SORT ORDER LOGIC
+=================================================
+
+PURPOSE:
+--------
+Allow admin to change display order of:
+- Products
+- Categories
+
+Without manually typing numbers.
+
+Admin can drag rows up/down.
+Order saves automatically.
+Frontend follows the same order.
+
+-------------------------------------------------
+DATABASE STRUCTURE
+-------------------------------------------------
+
+Each table contains:
+
+sort_order INT DEFAULT 0
+
+Example:
+
+products
+- id
+- name
+- ...
+- sort_order
+
+categories
+- id
+- parent_id
+- ...
+- sort_order
+
+-------------------------------------------------
+STEP 1 - FRONTEND DISPLAY ORDER
+-------------------------------------------------
+
+Whenever fetching categories or products:
+
+ORDER BY sort_order ASC, name ASC
+
+Meaning:
+1) First sort by admin-defined order
+2) If same number, fallback to name
+
+-------------------------------------------------
+STEP 2 - ADMIN DRAG ENABLED
+-------------------------------------------------
+
+In admin panel:
+
+<tbody id="sortable-items">
+    <tr data-id="1">
+    <tr data-id="2">
+    <tr data-id="3">
+</tbody>
+
+Each row has:
+
+data-id = product/category id
+
+-------------------------------------------------
+STEP 3 - JAVASCRIPT (SortableJS)
+-------------------------------------------------
+
+Library used:
+SortableJS
+
+It detects when row is dragged and dropped.
+
+On drag end:
+
+1) Loop through all rows
+2) Get their new position
+3) Create array:
+
+[
+  { id: 3, position: 1 },
+  { id: 1, position: 2 },
+  { id: 2, position: 3 }
+]
+
+4) Send this array via AJAX to:
+
+update-order.php
+
+-------------------------------------------------
+STEP 4 - UPDATE ORDER SCRIPT
+-------------------------------------------------
+
+update-order.php receives JSON data.
+
+Loop through each item:
+
+UPDATE table_name
+SET sort_order = position
+WHERE id = item_id
+
+Example:
+
+UPDATE products SET sort_order=1 WHERE id=3
+UPDATE products SET sort_order=2 WHERE id=1
+UPDATE products SET sort_order=3 WHERE id=2
+
+-------------------------------------------------
+STEP 5 - RESULT
+-------------------------------------------------
+
+Database now stores new order.
+
+Next time frontend loads:
+
+ORDER BY sort_order ASC
+
+So items appear in same order admin arranged.
+
+-------------------------------------------------
+WHY THIS SYSTEM IS PROFESSIONAL
+-------------------------------------------------
+
+• No manual numbering required
+• Real-time reorder
+• No page reload
+• AJAX based
+• Clean database storage
+• Scalable
+• Industry standard CMS behavior
+
+-------------------------------------------------
+LIMITATION (CURRENT VERSION)
+-------------------------------------------------
+
+Currently:
+Drag works across entire table.
+
+Advanced version could:
+- Restrict reorder within same parent category
+- Support nested tree drag structure
+
+-------------------------------------------------
+FLOW SUMMARY
+-------------------------------------------------
+
+Admin drags row →
+JS captures new order →
+AJAX sends order →
+PHP updates sort_order →
+Frontend follows updated order.
+
+-------------------------------------------------
+
+END OF DOCUMENT
