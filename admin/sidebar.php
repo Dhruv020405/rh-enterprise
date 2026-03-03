@@ -20,7 +20,7 @@ $active_inquiries  = (strpos($_SERVER['PHP_SELF'], '/inquiries/') !== false) ? '
 ?>
 
 <div class="sidebar d-flex flex-column">
-    
+
     <!-- Logo Section -->
     <div class="sidebar-brand text-center pt-4 pb-3 px-3">
         <img src="<?= $prefix ?>../uploads/logo.png" alt="RH Enterprise" class="shadow-sm" style="width: 100%; max-width: 160px; height: auto; border-radius: 15px; background: #ffffff; padding: 12px;">
@@ -60,8 +60,8 @@ $active_inquiries  = (strpos($_SERVER['PHP_SELF'], '/inquiries/') !== false) ? '
 
     <!-- Logout -->
     <div class="p-3 mt-auto">
-        <a href="<?= $prefix ?>logout.php" 
-           class="btn btn-danger w-100 fw-semibold shadow-sm">
+        <a href="<?= $prefix ?>logout.php"
+            class="btn btn-danger w-100 fw-semibold shadow-sm">
             Logout
         </a>
     </div>

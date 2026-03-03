@@ -2,7 +2,8 @@
 require_once "../includes/auth.php";
 require_once "../../config/database.php";
 
-function displayCategories($parent_id = NULL, $level = 0) {
+function displayCategories($parent_id = NULL, $level = 0)
+{
     global $conn;
 
     // Use prepared statements based on parent_id
@@ -27,17 +28,17 @@ function displayCategories($parent_id = NULL, $level = 0) {
     // If categories exist at this level, output a list container
     if ($result->num_rows > 0) {
         echo "<ul class='sortable-list list-unstyled mb-0 w-100'>";
-        
+
         while ($row = $result->fetch_assoc()) {
             $date = date("M d, Y", strtotime($row['created_at']));
             $indent = $level * 2.5; // Controls the subcategory left-padding (indentation)
 
             // Start List Item (Acts as the grouping container for parent + children)
             echo "<li class='category-item w-100' data-id='{$row['id']}'>";
-            
+
             // --- Start Pseudo-Table Row ---
             echo "<div class='table-row d-flex align-items-center border-bottom bg-white py-2 pe-3 hover-bg-light transition-base'>";
-            
+
             // 1. Drag Handle
             echo "<div class='drag-handle text-muted text-center' style='cursor:grab; width: 5%;' title='Drag to reorder'>";
             echo "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' viewBox='0 0 16 16'><path d='M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg>";
@@ -87,7 +88,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
 
             echo "</li>"; // End List Item
         }
-        
+
         echo "</ul>";
     } elseif ($parent_id === NULL) {
         // Fallback if the entire database is completely empty
@@ -98,6 +99,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,12 +119,13 @@ function displayCategories($parent_id = NULL, $level = 0) {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
         }
+
         /* Sidebar Base Styling Required for this page layout */
         .sidebar {
             background-color: var(--admin-dark);
             min-height: 100vh;
             width: 260px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
             left: 0;
@@ -140,11 +143,37 @@ function displayCategories($parent_id = NULL, $level = 0) {
             margin-bottom: 1.5rem;
         }
 
-        .sidebar-brand span { color: var(--admin-accent); }
-        .nav-link { color: rgba(255, 255, 255, 0.7); padding: 0.8rem 1.5rem; border-left: 4px solid transparent; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: all 0.3s; }
-        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255, 255, 255, 0.05); border-left-color: var(--admin-accent); }
-        .nav-link svg { opacity: 0.7; }
-        .nav-link:hover svg, .nav-link.active svg { opacity: 1; }
+        .sidebar-brand span {
+            color: var(--admin-accent);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.8rem 1.5rem;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left-color: var(--admin-accent);
+        }
+
+        .nav-link svg {
+            opacity: 0.7;
+        }
+
+        .nav-link:hover svg,
+        .nav-link.active svg {
+            opacity: 1;
+        }
+
         /* Main Content Layout */
         .main-content {
             margin-left: 260px;
@@ -157,7 +186,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
             background: #ffffff;
             border: none;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
 
@@ -184,7 +213,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         .hover-bg-light:hover {
             background-color: #f8f9fa !important;
         }
@@ -197,125 +226,139 @@ function displayCategories($parent_id = NULL, $level = 0) {
         .drag-handle:active {
             cursor: grabbing !important;
         }
-        
-        .sortable-ghost > .table-row {
+
+        .sortable-ghost>.table-row {
             background-color: #f1f3f5 !important;
             opacity: 0.8;
         }
 
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; width: 100%; padding: 1rem; }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<!-- Dynamic Sidebar Included Here -->
-<?php include "../sidebar.php"; ?>
+    <!-- Dynamic Sidebar Included Here -->
+    <?php include "../sidebar.php"; ?>
 
-<!-- MAIN CONTENT WRAPPER -->
-<div class="main-content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12">
-                
-                <!-- Header & Navigation -->
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <div>
-                        <h3 class="fw-bold mb-0 text-dark">Category Tree</h3>
-                        <div class="accent-line"></div>
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+
+                    <!-- Header & Navigation -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                        <div>
+                            <h3 class="fw-bold mb-0 text-dark">Category Tree</h3>
+                            <div class="accent-line"></div>
+                        </div>
+                        <a href="add.php" class="btn btn-danger d-inline-flex align-items-center gap-2 shadow-sm fw-semibold rounded-pill px-4 py-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            </svg>
+                            Add Category
+                        </a>
                     </div>
-                    <a href="add.php" class="btn btn-danger d-inline-flex align-items-center gap-2 shadow-sm fw-semibold rounded-pill px-4 py-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/></svg>
-                        Add Category
-                    </a>
-                </div>
 
-                <!-- Pseudo Table Card -->
-                <div class="card admin-card">
-                    <div class="admin-card-body table-responsive">
-                        
-                        <!-- Minimum width prevents grid from breaking on phones -->
-                        <div style="min-width: 800px;">
-                            
-                            <!-- Header Grid -->
-                            <div class="table-header d-flex align-items-center pe-3">
-                                <div class="text-center" style="width: 5%;"></div> <!-- Empty Drag Col -->
-                                <div style="width: 35%; padding-left: 0.5rem;">Category Name</div>
-                                <div style="width: 15%;">Image</div>
-                                <div style="width: 15%;">Status</div>
-                                <div style="width: 15%;">Created At</div>
-                                <div style="width: 15%;">Actions</div>
-                            </div>
+                    <!-- Pseudo Table Card -->
+                    <div class="card admin-card">
+                        <div class="admin-card-body table-responsive">
 
-                            <!-- Body Grid (Nested Sortable Lists) -->
-                            <div id="tree-container">
-                                <?php displayCategories(); ?>
+                            <!-- Minimum width prevents grid from breaking on phones -->
+                            <div style="min-width: 800px;">
+
+                                <!-- Header Grid -->
+                                <div class="table-header d-flex align-items-center pe-3">
+                                    <div class="text-center" style="width: 5%;"></div> <!-- Empty Drag Col -->
+                                    <div style="width: 35%; padding-left: 0.5rem;">Category Name</div>
+                                    <div style="width: 15%;">Image</div>
+                                    <div style="width: 15%;">Status</div>
+                                    <div style="width: 15%;">Created At</div>
+                                    <div style="width: 15%;">Actions</div>
+                                </div>
+
+                                <!-- Body Grid (Nested Sortable Lists) -->
+                                <div id="tree-container">
+                                    <?php displayCategories(); ?>
+                                </div>
+
                             </div>
 
                         </div>
-
                     </div>
-                </div>
 
-                <!-- Helper Text -->
-                <div class="text-muted small mt-3 ms-2 d-flex align-items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/></svg>
-                    Tip: You can reorder categories by dragging the grip icon. Dragging a main category moves all its subcategories with it!
-                </div>
+                    <!-- Helper Text -->
+                    <div class="text-muted small mt-3 ms-2 d-flex align-items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z" />
+                        </svg>
+                        Tip: You can reorder categories by dragging the grip icon. Dragging a main category moves all its subcategories with it!
+                    </div>
 
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Sortable JS -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Sortable JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        
-        // Target ALL dynamically generated sortable lists (parents and nested children)
-        const nestedSortables = document.querySelectorAll('.sortable-list');
-        
-        nestedSortables.forEach(function(el) {
-            new Sortable(el, {
-                animation: 150,
-                handle: '.drag-handle', // Lock dragging to grip icon
-                fallbackOnBody: true,
-                swapThreshold: 0.65,
-                ghostClass: 'sortable-ghost',
-                
-                onEnd: function () {
-                    let order = [];
-                    // Collect every category item top-to-bottom sequentially
-                    document.querySelectorAll('.category-item').forEach((row, index) => {
-                        if(row.dataset.id) {
-                            order.push({
-                                id: row.dataset.id,
-                                position: index + 1
-                            });
-                        }
-                    });
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
 
-                    // Push flattened sequence to DB mapping
-                    fetch('update-order.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(order)
-                    }).then(response => {
-                        if(response.ok) {
-                            console.log('Hierarchy Order successfully updated.');
-                        }
-                    }).catch(error => {
-                        console.error('Error updating hierarchy:', error);
-                    });
-                }
+            // Target ALL dynamically generated sortable lists (parents and nested children)
+            const nestedSortables = document.querySelectorAll('.sortable-list');
+
+            nestedSortables.forEach(function(el) {
+                new Sortable(el, {
+                    animation: 150,
+                    handle: '.drag-handle', // Lock dragging to grip icon
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    ghostClass: 'sortable-ghost',
+
+                    onEnd: function() {
+                        let order = [];
+                        // Collect every category item top-to-bottom sequentially
+                        document.querySelectorAll('.category-item').forEach((row, index) => {
+                            if (row.dataset.id) {
+                                order.push({
+                                    id: row.dataset.id,
+                                    position: index + 1
+                                });
+                            }
+                        });
+
+                        // Push flattened sequence to DB mapping
+                        fetch('update-order.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(order)
+                        }).then(response => {
+                            if (response.ok) {
+                                console.log('Hierarchy Order successfully updated.');
+                            }
+                        }).catch(error => {
+                            console.error('Error updating hierarchy:', error);
+                        });
+                    }
+                });
             });
-        });
 
-    });
-</script>
+        });
+    </script>
 
 </body>
+
 </html>

@@ -4,7 +4,8 @@ require_once "config/database.php";
 /* ============================
    GET CATEGORY PATH FUNCTION
 ============================ */
-function getCategoryPath($category_id) {
+function getCategoryPath($category_id)
+{
     global $conn;
 
     $path = [];
@@ -100,46 +101,51 @@ include "includes/navbar.php";
 ?>
 
 <style>
-:root {
-    --industrial-dark: #1a252f;
-    --industrial-accent: #dc3545;
-    --industrial-light: #f8f9fa;
-}
-body { background-color: var(--industrial-light); }
+    :root {
+        --industrial-dark: #1a252f;
+        --industrial-accent: #dc3545;
+        --industrial-light: #f8f9fa;
+    }
 
-.category-hero {
-    background: linear-gradient(135deg, var(--industrial-dark), #2c3e50);
-    color: #fff;
-    padding: 3.5rem 0;
-    margin-bottom: 3rem;
-}
+    body {
+        background-color: var(--industrial-light);
+    }
 
-.accent-line {
-    height: 4px;
-    width: 60px;
-    background: var(--industrial-accent);
-    margin-top: 8px;
-}
+    .category-hero {
+        background: linear-gradient(135deg, var(--industrial-dark), #2c3e50);
+        color: #fff;
+        padding: 3.5rem 0;
+        margin-bottom: 3rem;
+    }
 
-.hover-card {
-    border: none;
-    border-radius: 12px;
-    transition: .3s;
-}
-.hover-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 15px 25px rgba(0,0,0,.1);
-}
+    .accent-line {
+        height: 4px;
+        width: 60px;
+        background: var(--industrial-accent);
+        margin-top: 8px;
+    }
 
-.card-img-wrapper {
-    height: 220px;
-    overflow: hidden;
-}
-.card-img-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    .hover-card {
+        border: none;
+        border-radius: 12px;
+        transition: .3s;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, .1);
+    }
+
+    .card-img-wrapper {
+        height: 220px;
+        overflow: hidden;
+    }
+
+    .card-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 </style>
 
 <!-- HERO -->
@@ -162,8 +168,8 @@ body { background-color: var(--industrial-light); }
                         <?php if ($item['id'] == $category_id): ?>
                             <?= htmlspecialchars($item['name']); ?>
                         <?php else: ?>
-                            <a href="category.php?slug=<?= $item['slug']; ?>" 
-                               class="text-white-50 text-decoration-none">
+                            <a href="category.php?slug=<?= $item['slug']; ?>"
+                                class="text-white-50 text-decoration-none">
                                 <?= htmlspecialchars($item['name']); ?>
                             </a>
                         <?php endif; ?>
@@ -177,7 +183,7 @@ body { background-color: var(--industrial-light); }
         <h1 class="fw-bold"><?= htmlspecialchars($category['name']); ?></h1>
         <div class="accent-line"></div>
 
-        <?php if(!empty($category['description'])): ?>
+        <?php if (!empty($category['description'])): ?>
             <p class="mt-3 text-white-50">
                 <?= htmlspecialchars($category['description']); ?>
             </p>
@@ -197,12 +203,12 @@ body { background-color: var(--industrial-light); }
                 <h4 class="fw-bold text-secondary">Browse Subcategories</h4>
             </div>
 
-            <?php while($row = $subcategories->fetch_assoc()): ?>
+            <?php while ($row = $subcategories->fetch_assoc()): ?>
                 <div class="col-md-6 col-lg-4">
                     <div class="card hover-card h-100">
 
                         <div class="card-img-wrapper">
-                            <?php if($row['image']): ?>
+                            <?php if ($row['image']): ?>
                                 <img src="uploads/categories/<?= $row['image']; ?>">
                             <?php endif; ?>
                         </div>
@@ -210,7 +216,7 @@ body { background-color: var(--industrial-light); }
                         <div class="card-body text-center">
                             <h5><?= htmlspecialchars($row['name']); ?></h5>
                             <a href="category.php?slug=<?= urlencode($row['slug']); ?>"
-                               class="btn btn-outline-danger w-100">
+                                class="btn btn-outline-danger w-100">
                                 View Category
                             </a>
                         </div>
@@ -229,12 +235,12 @@ body { background-color: var(--industrial-light); }
                 <h4 class="fw-bold text-secondary">Available Products</h4>
             </div>
 
-            <?php while($product = $products->fetch_assoc()): ?>
+            <?php while ($product = $products->fetch_assoc()): ?>
                 <div class="col-md-6 col-lg-4">
                     <div class="card hover-card h-100">
 
                         <div class="card-img-wrapper">
-                            <?php if($product['main_image']): ?>
+                            <?php if ($product['main_image']): ?>
                                 <img src="uploads/products/<?= $product['main_image']; ?>">
                             <?php endif; ?>
                         </div>
@@ -242,7 +248,7 @@ body { background-color: var(--industrial-light); }
                         <div class="card-body text-center">
                             <h5><?= htmlspecialchars($product['name']); ?></h5>
                             <a href="product.php?slug=<?= urlencode($product['slug']); ?>"
-                               class="btn btn-danger w-100">
+                                class="btn btn-danger w-100">
                                 View Product
                             </a>
                         </div>

@@ -12,8 +12,6 @@ try {
     }
 
     $conn->set_charset("utf8mb4");
-
 } catch (Exception $e) {
     die("Database Error: " . $e->getMessage());
 }
-?>

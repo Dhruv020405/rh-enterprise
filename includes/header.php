@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>RH Enterprise</title>
     <meta charset="UTF-8">
@@ -10,4 +11,5 @@
 
     <link href="/rh-enterprise/assets/css/style.css" rel="stylesheet">
 </head>
+
 <body>

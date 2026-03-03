@@ -4,7 +4,8 @@ require_once __DIR__ . "/../config/database.php";
 /* -------------------------
    Recursive Category Menu
 ------------------------- */
-function buildMenu($parent_id = NULL) {
+function buildMenu($parent_id = NULL)
+{
     global $conn;
 
     if ($parent_id === NULL) {
@@ -43,8 +44,10 @@ function buildMenu($parent_id = NULL) {
 <style>
     /* Industrial Navbar Styling */
     :root {
-        --nav-bg: #1a252f; /* Deep Charcoal / Navy */
-        --nav-accent: #dc3545; /* Industrial Red */
+        --nav-bg: #1a252f;
+        /* Deep Charcoal / Navy */
+        --nav-accent: #dc3545;
+        /* Industrial Red */
         --nav-text: #ffffff;
         --nav-text-muted: rgba(255, 255, 255, 0.85);
     }
@@ -68,9 +71,10 @@ function buildMenu($parent_id = NULL) {
         padding: 0;
         margin-right: 2rem;
     }
-    
+
     .navbar-logo {
-        max-height: 70px; /* Sized perfectly for the navbar */
+        max-height: 70px;
+        /* Sized perfectly for the navbar */
         width: auto;
         border-radius: 10px;
         background-color: #ffffff;
@@ -116,7 +120,8 @@ function buildMenu($parent_id = NULL) {
     .dropdown-item:focus {
         background-color: rgba(220, 53, 69, 0.08);
         color: var(--nav-accent);
-        padding-left: 1.8rem; /* Smooth indent on hover */
+        padding-left: 1.8rem;
+        /* Smooth indent on hover */
     }
 
     /* Multi-Level Submenu Logic */
@@ -124,7 +129,7 @@ function buildMenu($parent_id = NULL) {
         position: relative;
     }
 
-    .dropdown-submenu > .dropdown-menu {
+    .dropdown-submenu>.dropdown-menu {
         top: 0;
         left: 100%;
         margin-top: -0.5rem;
@@ -132,20 +137,21 @@ function buildMenu($parent_id = NULL) {
         display: none;
     }
 
-    .dropdown-submenu.show > .dropdown-menu {
+    .dropdown-submenu.show>.dropdown-menu {
         display: block;
     }
 
     /* Hover functionality for desktop devices */
     @media (min-width: 992px) {
+
         /* Open primary dropdown on hover */
-        .industrial-navbar .dropdown:hover > .dropdown-menu {
+        .industrial-navbar .dropdown:hover>.dropdown-menu {
             display: block;
             border-top: 3px solid var(--nav-accent);
         }
-        
+
         /* Open secondary dropdown on hover */
-        .industrial-navbar .dropdown-submenu:hover > .dropdown-menu {
+        .industrial-navbar .dropdown-submenu:hover>.dropdown-menu {
             display: block;
             border-top: none;
         }
@@ -155,7 +161,7 @@ function buildMenu($parent_id = NULL) {
 <!-- Sticky Top Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top industrial-navbar" id="mainNavbar">
     <div class="container">
-        
+
         <!-- Brand Logo -->
         <a class="navbar-brand" href="/rh-enterprise/index.php">
             <img src="uploads/logo.png" alt="RH Enterprise" class="navbar-logo shadow-sm">
@@ -172,11 +178,11 @@ function buildMenu($parent_id = NULL) {
                 <li class="nav-item">
                     <a class="nav-link" href="/rh-enterprise/index.php">Home</a>
                 </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link" href="/rh-enterprise/about.php">About Us</a>
                 </li>
-                
+
                 <!-- Dynamic Dropdown -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -198,12 +204,12 @@ function buildMenu($parent_id = NULL) {
                 <a href="/rh-enterprise/contact.php" class="btn btn-danger px-4 py-2 fw-semibold rounded-pill shadow-sm d-flex align-items-center gap-2">
                     Get Quote
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
                     </svg>
                 </a>
             </div>
         </div>
-        
+
     </div>
 </nav>
 
@@ -211,7 +217,7 @@ function buildMenu($parent_id = NULL) {
     // Handles toggling nested submenus (especially for mobile/click events)
     document.addEventListener("DOMContentLoaded", function() {
         let submenuToggles = document.querySelectorAll('.dropdown-submenu > a');
-        
+
         submenuToggles.forEach(function(element) {
             element.addEventListener("click", function(e) {
                 e.preventDefault();
@@ -219,7 +225,7 @@ function buildMenu($parent_id = NULL) {
 
                 // Find the parent submenu list item
                 let parentLi = this.parentElement;
-                
+
                 // Toggle the 'show' class which triggers the CSS display:block
                 parentLi.classList.toggle('show');
             });

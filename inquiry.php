@@ -95,62 +95,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="container mt-5">
 
-<?php if(!empty($success)): ?>
-    <div class="alert alert-success">
-        Thank you! Our team will contact you shortly.
-    </div>
-<?php endif; ?>
-
-<div class="card shadow p-4">
-<h4>Product Inquiry</h4>
-
-<form method="POST">
-
-    <!-- Honeypot -->
-    <div style="display:none;">
-        <input type="text" name="website">
-    </div>
-
-    <?php if($product_id): ?>
-        <input type="hidden" name="product_id" value="<?= $product_id; ?>">
-        <input type="hidden" name="product_name" value="<?= htmlspecialchars($product_name); ?>">
-
-        <div class="mb-3">
-            <label>Product</label>
-            <input type="text" class="form-control" 
-                   value="<?= htmlspecialchars($product_name); ?>" readonly>
+    <?php if (!empty($success)): ?>
+        <div class="alert alert-success">
+            Thank you! Our team will contact you shortly.
         </div>
     <?php endif; ?>
 
-    <div class="mb-3">
-        <label>Your Name</label>
-        <input type="text" name="name" class="form-control" required>
+    <div class="card shadow p-4">
+        <h4>Product Inquiry</h4>
+
+        <form method="POST">
+
+            <!-- Honeypot -->
+            <div style="display:none;">
+                <input type="text" name="website">
+            </div>
+
+            <?php if ($product_id): ?>
+                <input type="hidden" name="product_id" value="<?= $product_id; ?>">
+                <input type="hidden" name="product_name" value="<?= htmlspecialchars($product_name); ?>">
+
+                <div class="mb-3">
+                    <label>Product</label>
+                    <input type="text" class="form-control"
+                        value="<?= htmlspecialchars($product_name); ?>" readonly>
+                </div>
+            <?php endif; ?>
+
+            <div class="mb-3">
+                <label>Your Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Company</label>
+                <input type="text" name="company" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Message</label>
+                <textarea name="message" class="form-control" rows="4" required></textarea>
+            </div>
+
+            <button class="btn btn-danger">Submit Inquiry</button>
+
+        </form>
     </div>
-
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required>
-    </div>
-
-    <div class="mb-3">
-        <label>Phone</label>
-        <input type="text" name="phone" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Company</label>
-        <input type="text" name="company" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Message</label>
-        <textarea name="message" class="form-control" rows="4" required></textarea>
-    </div>
-
-    <button class="btn btn-danger">Submit Inquiry</button>
-
-</form>
-</div>
 
 </div>
 
