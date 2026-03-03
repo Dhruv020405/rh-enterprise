@@ -65,14 +65,21 @@ function buildMenu($parent_id = NULL) {
 
     /* Brand Logo */
     .industrial-navbar .navbar-brand {
-        font-size: 1.75rem;
-        font-weight: 800;
-        color: var(--nav-text) !important;
-        letter-spacing: 0.5px;
+        padding: 0;
+        margin-right: 2rem;
     }
     
-    .industrial-navbar .navbar-brand span {
-        color: var(--nav-accent);
+    .navbar-logo {
+        max-height: 70px; /* Sized perfectly for the navbar */
+        width: auto;
+        border-radius: 10px;
+        background-color: #ffffff;
+        padding: 6px 12px;
+        transition: transform 0.3s ease;
+    }
+
+    .navbar-logo:hover {
+        transform: scale(1.05);
     }
 
     /* Nav Links */
@@ -151,7 +158,7 @@ function buildMenu($parent_id = NULL) {
         
         <!-- Brand Logo -->
         <a class="navbar-brand" href="/rh-enterprise/index.php">
-            RH <span>Enterprise</span>
+            <img src="uploads/logo.png" alt="RH Enterprise" class="navbar-logo shadow-sm">
         </a>
 
         <!-- Mobile Toggler -->

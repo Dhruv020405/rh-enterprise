@@ -5,6 +5,7 @@ require_once "../../config/database.php";
 function displayCategories($parent_id = NULL, $level = 0) {
     global $conn;
 
+    // Use prepared statements based on parent_id
     if ($parent_id === NULL) {
         $stmt = $conn->prepare("
             SELECT * FROM categories 
@@ -23,64 +24,74 @@ function displayCategories($parent_id = NULL, $level = 0) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    while ($row = $result->fetch_assoc()) {
+    // If categories exist at this level, output a list container
+    if ($result->num_rows > 0) {
+        echo "<ul class='sortable-list list-unstyled mb-0 w-100'>";
+        
+        while ($row = $result->fetch_assoc()) {
+            $date = date("M d, Y", strtotime($row['created_at']));
+            $indent = $level * 2.5; // Controls the subcategory left-padding (indentation)
 
-        // Format Date
-        $date = date("M d, Y", strtotime($row['created_at']));
+            // Start List Item (Acts as the grouping container for parent + children)
+            echo "<li class='category-item w-100' data-id='{$row['id']}'>";
+            
+            // --- Start Pseudo-Table Row ---
+            echo "<div class='table-row d-flex align-items-center border-bottom bg-white py-2 pe-3 hover-bg-light transition-base'>";
+            
+            // 1. Drag Handle
+            echo "<div class='drag-handle text-muted text-center' style='cursor:grab; width: 5%;' title='Drag to reorder'>";
+            echo "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' viewBox='0 0 16 16'><path d='M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg>";
+            echo "</div>";
 
-        echo "<tr data-id='{$row['id']}' class='align-middle bg-white border-bottom'>";
+            // 2. Category Name (With Dynamic Indentation)
+            echo "<div style='width: 35%; padding-left: {$indent}rem;' class='text-dark fw-semibold'>";
+            if ($level > 0) {
+                echo "<span class='text-muted fw-normal me-2'>↳</span>";
+            }
+            echo htmlspecialchars($row['name']);
+            echo "</div>";
 
-        // Drag Handle
-        echo "<td class='drag-handle text-muted text-center' style='cursor:grab; width: 5%;' title='Drag to reorder'>";
-        echo "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' class='bi bi-grip-vertical' viewBox='0 0 16 16'><path d='M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg>";
-        echo "</td>";
+            // 3. Image
+            echo "<div style='width: 15%;'>";
+            if ($row['image']) {
+                echo "<img src='../../uploads/categories/{$row['image']}' class='rounded shadow-sm border bg-white' style='width: 45px; height: 45px; object-fit: cover;' alt='Image'>";
+            } else {
+                echo "<div class='bg-light text-muted border rounded d-flex align-items-center justify-content-center' style='width: 45px; height: 45px; font-size: 0.7rem; font-weight: 500;'>No Img</div>";
+            }
+            echo "</div>";
 
-        // Category Name with Hierarchy Indentation
-        echo "<td style='width: 35%;'>";
-        if ($level > 0) {
-            echo "<span class='text-muted'>" . str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;↳ ", $level) . "</span>";
+            // 4. Status
+            echo "<div style='width: 15%;'>";
+            if ($row['status']) {
+                echo "<span class='badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-semibold'>Active</span>";
+            } else {
+                echo "<span class='badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill fw-semibold'>Inactive</span>";
+            }
+            echo "</div>";
+
+            // 5. Created At
+            echo "<div style='width: 15%;' class='text-muted small'>{$date}</div>";
+
+            // 6. Actions
+            echo "<div style='width: 15%;'>";
+            echo "<div class='d-flex gap-2'>";
+            echo "<a href='edit.php?id={$row['id']}' class='btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 shadow-sm'><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='currentColor' viewBox='0 0 16 16'><path d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z'/></svg></a>";
+            echo "<a href='delete.php?id={$row['id']}' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 shadow-sm' onclick=\"return confirm('Are you sure you want to delete this category?')\"><svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='currentColor' viewBox='0 0 16 16'><path d='M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z'/></svg></a>";
+            echo "</div>";
+            echo "</div>";
+
+            echo "</div>"; // --- End Pseudo-Table Row ---
+
+            // Recursive call for subcategories (Nests inside the current <li>)
+            displayCategories($row['id'], $level + 1);
+
+            echo "</li>"; // End List Item
         }
-        echo "<span class='fw-semibold text-dark'>" . htmlspecialchars($row['name']) . "</span>";
-        echo "</td>";
-
-        // Image
-        echo "<td style='width: 15%;'>";
-        if ($row['image']) {
-            echo "<img src='../../uploads/categories/{$row['image']}' class='rounded shadow-sm border' style='width: 45px; height: 45px; object-fit: cover;' alt='Image'>";
-        } else {
-            echo "<div class='bg-light text-muted border rounded d-flex align-items-center justify-content-center' style='width: 45px; height: 45px; font-size: 0.7rem; font-weight: 500;'>No Img</div>";
-        }
-        echo "</td>";
-
-        // Status
-        echo "<td style='width: 15%;'>";
-        if ($row['status']) {
-            echo "<span class='badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 rounded-pill fw-semibold'>Active</span>";
-        } else {
-            echo "<span class='badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 px-3 py-2 rounded-pill fw-semibold'>Inactive</span>";
-        }
-        echo "</td>";
-
-        // Created Date
-        echo "<td class='text-muted small' style='width: 15%;'>{$date}</td>";
-
-        // Actions
-        echo "<td style='width: 15%;'>
-                <div class='d-flex gap-2'>
-                    <a href='edit.php?id={$row['id']}' class='btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 shadow-sm'>
-                        <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='currentColor' viewBox='0 0 16 16'><path d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z'/></svg> 
-                        Edit
-                    </a>
-                    <a href='delete.php?id={$row['id']}' class='btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 shadow-sm' onclick=\"return confirm('Are you sure you want to delete this category?')\">
-                        <svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='currentColor' viewBox='0 0 16 16'><path d='M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z'/></svg>
-                    </a>
-              </div>
-              </td>";
-
-        echo "</tr>";
-
-        // Recursive call
-        displayCategories($row['id'], $level + 1);
+        
+        echo "</ul>";
+    } elseif ($parent_id === NULL) {
+        // Fallback if the entire database is completely empty
+        echo "<div class='text-center py-5 text-muted'>No categories found. Click 'Add Category' to start.</div>";
     }
 }
 ?>
@@ -106,8 +117,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
         }
-
-        /* Sidebar Styling */
+        /* Sidebar Base Styling Required for this page layout */
         .sidebar {
             background-color: var(--admin-dark);
             min-height: 100vh;
@@ -130,37 +140,12 @@ function displayCategories($parent_id = NULL, $level = 0) {
             margin-bottom: 1.5rem;
         }
 
-        .sidebar-brand span {
-            color: var(--admin-accent);
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.7);
-            padding: 0.8rem 1.5rem;
-            border-left: 4px solid transparent;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-        }
-
-        .nav-link:hover, .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-left-color: var(--admin-accent);
-        }
-
-        .nav-link svg {
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-link:hover svg, .nav-link.active svg {
-            opacity: 1;
-        }
-
-        /* Main Content Wrapper */
+        .sidebar-brand span { color: var(--admin-accent); }
+        .nav-link { color: rgba(255, 255, 255, 0.7); padding: 0.8rem 1.5rem; border-left: 4px solid transparent; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: all 0.3s; }
+        .nav-link:hover, .nav-link.active { color: white; background-color: rgba(255, 255, 255, 0.05); border-left-color: var(--admin-accent); }
+        .nav-link svg { opacity: 0.7; }
+        .nav-link:hover svg, .nav-link.active svg { opacity: 1; }
+        /* Main Content Layout */
         .main-content {
             margin-left: 260px;
             padding: 2rem;
@@ -177,7 +162,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
         }
 
         .admin-card-body {
-            padding: 0; /* Removing padding to let the table span full width */
+            padding: 0;
         }
 
         .accent-line {
@@ -188,63 +173,47 @@ function displayCategories($parent_id = NULL, $level = 0) {
             margin-top: 0.5rem;
         }
 
-        /* Table Styling */
-        .table-custom {
-            margin-bottom: 0;
-        }
-        
-        .table-custom thead th {
+        /* --- Custom Tree Table Grid (Replaces standard table) --- */
+        .table-header {
             background-color: #f8f9fa;
             color: var(--admin-dark);
             font-weight: 600;
             border-bottom: 2px solid #e9ecef;
-            padding: 1rem;
-            font-size: 0.9rem;
+            padding: 1rem 0;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
-        .table-custom tbody td {
-            padding: 1rem;
-            vertical-align: middle;
-            color: #495057;
-        }
-
-        .table-custom tbody tr:hover {
+        
+        .hover-bg-light:hover {
             background-color: #f8f9fa !important;
         }
 
-        /* Drag Handle State */
+        .transition-base {
+            transition: background-color 0.2s ease;
+        }
+
+        /* Sortable States */
         .drag-handle:active {
             cursor: grabbing !important;
         }
         
-        .sortable-ghost {
+        .sortable-ghost > .table-row {
             background-color: #f1f3f5 !important;
             opacity: 0.8;
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                min-height: auto;
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-                padding: 1rem;
-            }
+            .main-content { margin-left: 0; width: 100%; padding: 1rem; }
         }
     </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
+<!-- Dynamic Sidebar Included Here -->
 <?php include "../sidebar.php"; ?>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN CONTENT WRAPPER -->
 <div class="main-content">
     <div class="container-fluid">
         <div class="row">
@@ -262,32 +231,37 @@ function displayCategories($parent_id = NULL, $level = 0) {
                     </a>
                 </div>
 
-                <!-- Table Card -->
+                <!-- Pseudo Table Card -->
                 <div class="card admin-card">
                     <div class="admin-card-body table-responsive">
-                        <table class="table table-custom border-0">
-                            <thead>
-                                <tr>
-                                    <th></th> <!-- Empty header for Drag Handle -->
-                                    <th>Category Name</th>
-                                    <th>Image</th>
-                                    <th>Status</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
+                        
+                        <!-- Minimum width prevents grid from breaking on phones -->
+                        <div style="min-width: 800px;">
+                            
+                            <!-- Header Grid -->
+                            <div class="table-header d-flex align-items-center pe-3">
+                                <div class="text-center" style="width: 5%;"></div> <!-- Empty Drag Col -->
+                                <div style="width: 35%; padding-left: 0.5rem;">Category Name</div>
+                                <div style="width: 15%;">Image</div>
+                                <div style="width: 15%;">Status</div>
+                                <div style="width: 15%;">Created At</div>
+                                <div style="width: 15%;">Actions</div>
+                            </div>
 
-                            <tbody id="sortable-categories">
+                            <!-- Body Grid (Nested Sortable Lists) -->
+                            <div id="tree-container">
                                 <?php displayCategories(); ?>
-                            </tbody>
-                        </table>
+                            </div>
+
+                        </div>
+
                     </div>
                 </div>
 
                 <!-- Helper Text -->
                 <div class="text-muted small mt-3 ms-2 d-flex align-items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/></svg>
-                    Tip: You can reorder categories by clicking and dragging the grip icon on the left of each row.
+                    Tip: You can reorder categories by dragging the grip icon. Dragging a main category moves all its subcategories with it!
                 </div>
 
             </div>
@@ -300,34 +274,46 @@ function displayCategories($parent_id = NULL, $level = 0) {
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        let sortable = new Sortable(document.getElementById('sortable-categories'), {
-            animation: 150,
-            handle: '.drag-handle', // Restricts dragging strictly to the icon
-            ghostClass: 'sortable-ghost', // Adds a smooth background to the row being dragged
-            onEnd: function () {
-                let order = [];
-                document.querySelectorAll('#sortable-categories tr').forEach((row, index) => {
-                    if(row.dataset.id) {
-                        order.push({
-                            id: row.dataset.id,
-                            position: index + 1
-                        });
-                    }
-                });
+        
+        // Target ALL dynamically generated sortable lists (parents and nested children)
+        const nestedSortables = document.querySelectorAll('.sortable-list');
+        
+        nestedSortables.forEach(function(el) {
+            new Sortable(el, {
+                animation: 150,
+                handle: '.drag-handle', // Lock dragging to grip icon
+                fallbackOnBody: true,
+                swapThreshold: 0.65,
+                ghostClass: 'sortable-ghost',
+                
+                onEnd: function () {
+                    let order = [];
+                    // Collect every category item top-to-bottom sequentially
+                    document.querySelectorAll('.category-item').forEach((row, index) => {
+                        if(row.dataset.id) {
+                            order.push({
+                                id: row.dataset.id,
+                                position: index + 1
+                            });
+                        }
+                    });
 
-                fetch('update-order.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                }).then(response => {
-                    if(response.ok) {
-                        console.log('Order updated successfully.');
-                    }
-                }).catch(error => {
-                    console.error('Error updating order:', error);
-                });
-            }
+                    // Push flattened sequence to DB mapping
+                    fetch('update-order.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(order)
+                    }).then(response => {
+                        if(response.ok) {
+                            console.log('Hierarchy Order successfully updated.');
+                        }
+                    }).catch(error => {
+                        console.error('Error updating hierarchy:', error);
+                    });
+                }
+            });
         });
+
     });
 </script>
 

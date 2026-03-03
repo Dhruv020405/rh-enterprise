@@ -188,7 +188,9 @@ include "includes/navbar.php";
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-end mb-5">
             <div>
-                <h2 class="fw-bold" style="color: var(--industrial-dark);">Our Product Categories</h2>
+                <h2 class="fw-bold" style="color: var(--industrial-dark);">
+                    Our Product Categories
+                </h2>
                 <div class="accent-line"></div>
             </div>
             <div class="d-none d-md-block">
@@ -199,34 +201,41 @@ include "includes/navbar.php";
         <div class="row g-4">
 
             <?php
-            // PRESERVED ORIGINAL PHP LOGIC
+            require_once "config/database.php";
+
             $stmt = $conn->prepare("
                 SELECT * FROM categories 
-                WHERE parent_id IS NULL AND status=1 
-                ORDER BY name ASC
+                WHERE parent_id IS NULL 
+                AND status = 1 
+                ORDER BY sort_order ASC
             ");
+
             $stmt->execute();
             $result = $stmt->get_result();
 
-            while($row = $result->fetch_assoc()):
+            while ($row = $result->fetch_assoc()):
             ?>
 
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 hover-card rounded-4 overflow-hidden border-0 bg-white">
 
-                        <?php if($row['image']): ?>
+                        <?php if (!empty($row['image'])): ?>
                             <div class="position-relative">
-                                <img src="uploads/categories/<?= $row['image']; ?>" 
+                                <img src="uploads/categories/<?= htmlspecialchars($row['image']); ?>" 
                                      class="card-img-top w-100" 
                                      style="height: 240px; object-fit: cover;"
                                      alt="<?= htmlspecialchars($row['name']); ?>">
-                                <!-- Overlay Gradient for premium look -->
-                                <div class="position-absolute bottom-0 w-100 h-50" style="background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);"></div>
+
+                                <div class="position-absolute bottom-0 w-100 h-50"
+                                     style="background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);">
+                                </div>
                             </div>
                         <?php else: ?>
-                            <!-- Fallback image layout if no image exists -->
-                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 240px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#e9ecef" viewBox="0 0 16 16"><path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3zM2.5 14c0 .275.225.5.5.5h9c.275 0 .5-.225.5-.5V5.5H8a2 2 0 0 1-2-2V1.5H3a.5.5 0 0 0-.5.5v12z"/></svg>
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+                                 style="height: 240px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="#e9ecef" viewBox="0 0 16 16">
+                                    <path d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3zM2.5 14c0 .275.225.5.5.5h9c.275 0 .5-.225.5-.5V5.5H8a2 2 0 0 1-2-2V1.5H3a.5.5 0 0 0-.5.5v12z"/>
+                                </svg>
                             </div>
                         <?php endif; ?>
 
@@ -236,12 +245,18 @@ include "includes/navbar.php";
                                     <?= htmlspecialchars($row['name']); ?>
                                 </h4>
                             </div>
-                            
-                            <a href="category.php?slug=<?= $row['slug']; ?>" 
+
+                            <a href="category.php?slug=<?= urlencode($row['slug']); ?>"
                                class="btn btn-danger w-100 mt-3 py-2 fw-semibold">
-                                View Products <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="ms-1" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+                                View Products
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                     fill="currentColor" class="ms-1" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                </svg>
                             </a>
                         </div>
+
                     </div>
                 </div>
 

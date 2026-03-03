@@ -1,67 +1,124 @@
-=========================================
-RH ENTERPRISE - SMART CATEGORY LOGIC
-=========================================
+=================================================
+RH ENTERPRISE - ADVANCED SMART CATEGORY LOGIC
+=================================================
 
 PURPOSE:
 --------
-Category page automatically decide karega ki:
-- Subcategory dikhani hai
-- Product listing dikhani hai
-- Ya direct product page open karna hai
+Category page dynamically decide karega ki:
 
------------------------------------------
-MAIN DECISION FLOW
------------------------------------------
+• Subcategories dikhani hain ya nahi
+• Products dikhane hain ya nahi
+• Single product ho toh direct redirect karna hai
+• Empty state handle karna hai
+
+System fully dynamic hai.
+Unlimited category nesting supported hai.
+
+-------------------------------------------------
+CORE PRINCIPLE
+-------------------------------------------------
+
+Category ke andar 3 cheezein possible hain:
+
+1) Subcategories ho sakti hain
+2) Products ho sakte hain
+3) Dono ho sakte hain
+4) Dono na bhi ho sakte hain
+
+System in sab scenarios ko intelligently handle karta hai.
+
+-------------------------------------------------
+UPDATED DECISION FLOW (CURRENT IMPLEMENTATION)
+-------------------------------------------------
 
 STEP 1:
-Check karo — kya is category ke andar subcategories hain?
+Validate category using slug
+
+IF category not found:
+    Stop execution (Invalid category)
+
+STEP 2:
+Fetch subcategories (status=1)
+
+STEP 3:
+Fetch products (status=1)
+
+STEP 4:
+SMART REDIRECT CONDITION
+
+IF:
+    subcategory_count == 0
+    AND product_count == 1
+
+THEN:
+    Redirect directly to product page
+
+Why?
+Avoid extra click for single product categories.
+
+STEP 5:
+DISPLAY LOGIC
 
 IF subcategories exist:
-    → Show subcategories (category view)
+    Show subcategory grid
 
-ELSE:
-    → Check products inside category
+IF products exist:
+    Show product listing grid
 
-        IF exactly 1 product:
-            → Redirect to product detail page
+IF both exist:
+    Show subcategories first
+    Then show products below
 
-        IF more than 1 product:
-            → Show product listing grid
+IF none exist:
+    Show empty message
 
-        IF no product:
-            → Show "No subcategories or products found"
+-------------------------------------------------
+PSEUDO CODE (FINAL VERSION)
+-------------------------------------------------
 
------------------------------------------
-PSEUDO CODE
------------------------------------------
+validate_category()
 
-IF has_subcategories:
+sub_count = get_subcategory_count()
+prod_count = get_product_count()
+
+IF sub_count == 0 AND prod_count == 1:
+    redirect_to_product()
+
+IF sub_count > 0:
     show_subcategories()
 
-ELSE:
-    IF product_count == 1:
-        redirect_to_product()
+IF prod_count > 0:
+    show_products()
 
-    ELSE IF product_count > 1:
-        show_product_listing()
+IF sub_count == 0 AND prod_count == 0:
+    show_empty_message()
 
-    ELSE:
-        show_empty_message()
+-------------------------------------------------
+WHY THIS VERSION IS BETTER
+-------------------------------------------------
 
------------------------------------------
-WHY THIS LOGIC IS IMPORTANT
------------------------------------------
+• Supports mixed structure (category + product together)
+• No restriction like old "elseif" logic
+• Better for industrial product catalog
+• Flexible hierarchy
+• Smart UX
+• Clean CMS behavior
+• Admin sort_order respected
 
-• Unlimited category depth supported
-• Mixed structure supported (category + product)
-• No useless empty pages
-• Better user experience
-• Professional CMS architecture
-• Works like Amazon / Flipkart category structure
+-------------------------------------------------
+SORT ORDER SYSTEM
+-------------------------------------------------
 
------------------------------------------
+Both queries use:
+
+ORDER BY sort_order ASC, name ASC
+
+Meaning:
+Admin drag & drop order controls frontend display.
+
+-------------------------------------------------
 EXAMPLE STRUCTURE
------------------------------------------
+-------------------------------------------------
 
 TATA
  ├── Clothing
@@ -75,102 +132,40 @@ TATA
        │
        └── Truck
 
-Flow Behaviour:
+-------------------------------------------------
+FLOW BEHAVIOUR EXAMPLES
+-------------------------------------------------
 
-TATA → Show Clothing & Motors
-Clothing → Show Jeans & Pants
-Motors → Show Car & Truck
-Car → Show Nexon & Safari
-Truck → 
-    IF 1 product → direct open product page
-    IF multiple → show listing
-    IF none → show empty message
+CASE 1:
+Category has subcategories only
+→ Show subcategories
 
+CASE 2:
+Category has products only
+    If 1 product → redirect
+    If multiple → show listing
 
-=========================================
-RH ENTERPRISE - SMART CATEGORY LOGIC
-=========================================
+CASE 3:
+Category has both subcategories + products
+→ Show subcategories first
+→ Then show products
 
-PURPOSE:
---------
-Category page automatically decide karega ki:
-- Subcategory dikhani hai
-- Product listing dikhani hai
-- Ya direct product page open karna hai
+CASE 4:
+Category empty
+→ Show empty message
 
------------------------------------------
-MAIN DECISION FLOW
------------------------------------------
+-------------------------------------------------
+ARCHITECTURE BENEFITS
+-------------------------------------------------
 
-STEP 1:
-Check karo — kya is category ke andar subcategories hain?
+• Unlimited nesting supported
+• Industrial B2B compatible
+• Smart redirect reduces click friction
+• No unnecessary empty pages
+• Works like Amazon category hierarchy
+• Production ready CMS structure
+• SEO friendly breadcrumb compatible
 
-IF subcategories exist:
-    → Show subcategories (category view)
+-------------------------------------------------
 
-ELSE:
-    → Check products inside category
-
-        IF exactly 1 product:
-            → Redirect to product detail page
-
-        IF more than 1 product:
-            → Show product listing grid
-
-        IF no product:
-            → Show "No subcategories or products found"
-
------------------------------------------
-PSEUDO CODE
------------------------------------------
-
-IF has_subcategories:
-    show_subcategories()
-
-ELSE:
-    IF product_count == 1:
-        redirect_to_product()
-
-    ELSE IF product_count > 1:
-        show_product_listing()
-
-    ELSE:
-        show_empty_message()
-
------------------------------------------
-WHY THIS LOGIC IS IMPORTANT
------------------------------------------
-
-• Unlimited category depth supported
-• Mixed structure supported (category + product)
-• No useless empty pages
-• Better user experience
-• Professional CMS architecture
-• Works like Amazon / Flipkart category structure
-
------------------------------------------
-EXAMPLE STRUCTURE
------------------------------------------
-
-TATA
- ├── Clothing
- │     ├── Jeans (Product)
- │     └── Pants (Product)
- │
- └── Motors
-       ├── Car
-       │     ├── Nexon (Product)
-       │     └── Safari (Product)
-       │
-       └── Truck
-
-Flow Behaviour:
-
-TATA → Show Clothing & Motors
-Clothing → Show Jeans & Pants
-Motors → Show Car & Truck
-Car → Show Nexon & Safari
-Truck → 
-    IF 1 product → direct open product page
-    IF multiple → show listing
-    IF none → show empty message
+END OF DOCUMENT

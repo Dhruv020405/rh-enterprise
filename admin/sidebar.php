@@ -20,8 +20,10 @@ $active_inquiries  = (strpos($_SERVER['PHP_SELF'], '/inquiries/') !== false) ? '
 ?>
 
 <div class="sidebar d-flex flex-column">
-    <div class="sidebar-brand">
-        RH <span>Admin</span>
+    
+    <!-- Logo Section -->
+    <div class="sidebar-brand text-center pt-4 pb-3 px-3">
+        <img src="<?= $prefix ?>../uploads/logo.png" alt="RH Enterprise" class="shadow-sm" style="width: 100%; max-width: 160px; height: auto; border-radius: 15px; background: #ffffff; padding: 12px;">
     </div>
 
     <ul class="nav flex-column mb-auto">

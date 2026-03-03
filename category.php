@@ -190,6 +190,7 @@ body { background-color: var(--industrial-light); }
 <div class="container pb-5">
     <div class="row g-4">
 
+        <!-- SUBCATEGORIES -->
         <?php if ($subcategories->num_rows > 0): ?>
 
             <div class="col-12">
@@ -218,9 +219,13 @@ body { background-color: var(--industrial-light); }
                 </div>
             <?php endwhile; ?>
 
-        <?php elseif ($products->num_rows > 1): ?>
+        <?php endif; ?>
 
-            <div class="col-12">
+
+        <!-- PRODUCTS -->
+        <?php if ($products->num_rows > 0): ?>
+
+            <div class="col-12 mt-5">
                 <h4 class="fw-bold text-secondary">Available Products</h4>
             </div>
 
@@ -246,7 +251,11 @@ body { background-color: var(--industrial-light); }
                 </div>
             <?php endwhile; ?>
 
-        <?php else: ?>
+        <?php endif; ?>
+
+
+        <!-- NOTHING FOUND -->
+        <?php if ($subcategories->num_rows == 0 && $products->num_rows == 0): ?>
 
             <div class="col-12 text-center py-5">
                 <h4>No Items Found</h4>
