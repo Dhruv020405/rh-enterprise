@@ -19,6 +19,7 @@ if (!$product) {
 
 $product_id = $product['id'];
 $breadcrumbPath = getCategoryPath($product['category_id']);
+
 /* Fetch Gallery Images */
 $stmtImg = $conn->prepare("SELECT * FROM product_images WHERE product_id=?");
 $stmtImg->bind_param("i", $product_id);
@@ -96,36 +97,88 @@ include "includes/navbar.php";
         background-color: var(--industrial-light);
     }
 
-    /* Product Image Gallery */
-    .product-image-wrapper {
+    /* =========================================
+       AMAZON STYLE GALLERY (PC & Mobile)
+    ========================================= */
+    .amazon-gallery {
+        display: flex;
+        flex-direction: column-reverse; /* Mobile view: thumbnails below main image */
+        gap: 15px;
+    }
+
+    .amazon-gallery-thumbnails {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        overflow-x: auto; /* Horizontal scroll for mobile */
+        scrollbar-width: thin; /* Firefox scrollbar */
+        padding-bottom: 5px;
+    }
+
+    /* Webkit custom scrollbar for thumbnails */
+    .amazon-gallery-thumbnails::-webkit-scrollbar {
+        height: 5px;
+        width: 5px;
+    }
+    .amazon-gallery-thumbnails::-webkit-scrollbar-thumb {
+        background-color: #dee2e6;
+        border-radius: 10px;
+    }
+
+    .amazon-thumbnail {
+        width: 55px;
+        height: 55px;
+        flex-shrink: 0;
+        border: 1px solid var(--industrial-border);
+        border-radius: 6px;
+        cursor: pointer;
+        object-fit: cover;
+        background-color: #fff;
+        padding: 2px;
+        transition: all 0.2s ease;
+    }
+
+    .amazon-thumbnail:hover, 
+    .amazon-thumbnail.active {
+        border: 2px solid var(--industrial-accent);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+    }
+
+    .amazon-gallery-main {
+        flex: 1;
         background-color: #ffffff;
         border: 1px solid var(--industrial-border);
         border-radius: 12px;
         padding: 1rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .main-image {
+    .amazon-gallery-main img {
         width: 100%;
-        max-height: 450px;
+        max-height: 480px;
         object-fit: contain;
         border-radius: 8px;
     }
 
-    .gallery-thumbnail {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 2px solid transparent;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    }
-
-    .gallery-thumbnail:hover {
-        border-color: var(--industrial-accent);
-        transform: translateY(-2px);
+    /* Desktop View adjustments */
+    @media (min-width: 992px) {
+        .amazon-gallery {
+            flex-direction: row; /* Desktop view: Thumbnails on Left, Main Image Right */
+            align-items: flex-start;
+        }
+        
+        .amazon-gallery-thumbnails {
+            flex-direction: column; /* Vertical stack */
+            width: 65px;
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 0;
+            padding-right: 5px;
+        }
     }
 
     /* Typography & Accents */
@@ -194,15 +247,13 @@ include "includes/navbar.php";
     <!-- Breadcrumb (Optional but good for UX) -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-
             <li class="breadcrumb-item">
                 <a href="index.php" class="text-decoration-none text-danger">Home</a>
             </li>
 
             <?php foreach ($breadcrumbPath as $item): ?>
                 <li class="breadcrumb-item">
-                    <a href="category.php?slug=<?= $item['slug']; ?>"
-                        class="text-decoration-none text-danger">
+                    <a href="category.php?slug=<?= $item['slug']; ?>" class="text-decoration-none text-danger">
                         <?= htmlspecialchars($item['name']); ?>
                     </a>
                 </li>
@@ -211,7 +262,6 @@ include "includes/navbar.php";
             <li class="breadcrumb-item active" aria-current="page">
                 <?= htmlspecialchars($product['name']); ?>
             </li>
-
         </ol>
     </nav>
 
@@ -219,45 +269,51 @@ include "includes/navbar.php";
 
         <!-- LEFT SIDE: MAIN IMAGE & GALLERY -->
         <div class="col-lg-6">
-            <div class="product-image-wrapper">
+            
+            <!-- AMAZON STYLE GALLERY -->
+            <div class="amazon-gallery">
 
-                <?php if ($product['main_image']): ?>
-                    <div class="text-center mb-3">
+                <!-- THUMBNAILS -->
+                <div class="amazon-gallery-thumbnails">
+                    
+                    <?php if ($product['main_image']): ?>
                         <img src="uploads/products/<?= $product['main_image']; ?>"
-                            id="mainProductImg"
-                            class="main-image"
-                            alt="<?= htmlspecialchars($product['name']); ?>">
-                    </div>
-                <?php else: ?>
-                    <!-- Placeholder if no image exists -->
-                    <div class="text-center mb-3 bg-light d-flex align-items-center justify-content-center main-image rounded" style="min-height: 350px;">
-                        <span class="text-muted">No Image Available</span>
-                    </div>
-                <?php endif; ?>
+                            class="amazon-thumbnail active"
+                            onmouseover="changeMainImage(this)"
+                            onclick="changeMainImage(this)"
+                            alt="Main Thumbnail">
+                    <?php endif; ?>
 
-                <!-- GALLERY -->
-                <?php if ($gallery->num_rows > 0): ?>
-                    <div class="d-flex gap-3 flex-wrap justify-content-center mt-4">
-
-                        <!-- Optionally include main image as first thumbnail -->
-                        <?php if ($product['main_image']): ?>
-                            <img src="uploads/products/<?= $product['main_image']; ?>"
-                                class="gallery-thumbnail bg-white"
-                                onclick="document.getElementById('mainProductImg').src=this.src;">
-                        <?php endif; ?>
-
-                        <!-- Loop through extra images -->
+                    <!-- Loop through extra gallery images -->
+                    <?php if ($gallery->num_rows > 0): ?>
                         <?php while ($img = $gallery->fetch_assoc()): ?>
                             <img src="uploads/products/<?= $img['image']; ?>"
-                                class="gallery-thumbnail bg-white"
-                                onclick="document.getElementById('mainProductImg').src=this.src;"
-                                alt="Gallery Image">
+                                class="amazon-thumbnail"
+                                onmouseover="changeMainImage(this)"
+                                onclick="changeMainImage(this)"
+                                alt="Gallery Thumbnail">
                         <?php endwhile; ?>
+                    <?php endif; ?>
 
-                    </div>
-                <?php endif; ?>
+                </div>
+
+                <!-- MAIN DISPLAY IMAGE -->
+                <div class="amazon-gallery-main">
+                    <?php if ($product['main_image']): ?>
+                        <img src="uploads/products/<?= $product['main_image']; ?>"
+                            id="mainProductImg"
+                            alt="<?= htmlspecialchars($product['name']); ?>">
+                    <?php else: ?>
+                        <!-- Placeholder if no image exists -->
+                        <div class="text-muted d-flex align-items-center justify-content-center w-100" style="min-height: 350px;">
+                            No Image Available
+                        </div>
+                    <?php endif; ?>
+                </div>
 
             </div>
+            <!-- /AMAZON STYLE GALLERY -->
+
         </div>
 
         <!-- RIGHT SIDE: DETAILS -->
@@ -274,10 +330,10 @@ include "includes/navbar.php";
 
             <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
                 <a href="inquiry.php?product_id=<?= $product['id']; ?>"
-                    class="btn btn-danger mt-3">
+                    class="btn btn-danger mt-3 px-4 py-2 fw-semibold">
                     Request Inquiry
                 </a>
-                <a href="uploads/brochures/placeholder.pdf" target="_blank" class="btn btn-outline-dark btn-lg px-4 shadow-sm fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
+                <a href="uploads/brochures/placeholder.pdf" target="_blank" class="btn btn-outline-dark mt-3 px-4 py-2 fw-semibold d-inline-flex align-items-center justify-content-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
                         <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
@@ -286,7 +342,7 @@ include "includes/navbar.php";
                 </a>
             </div>
 
-            <!-- FEATURES & APPLICATIONS TABS (Optional but clean for layout) -->
+            <!-- FEATURES & APPLICATIONS TABS -->
             <div class="mt-5">
 
                 <!-- FEATURES -->
@@ -319,42 +375,56 @@ include "includes/navbar.php";
 
     </div>
 </div>
+
 <?php if ($relatedProducts->num_rows > 0): ?>
 
-    <hr class="my-5">
+    <div class="container mb-5">
+        <hr class="mb-5">
+        <h4 class="fw-bold mb-4" style="color: var(--industrial-dark);">Related Products</h4>
 
-    <h4 class="mb-4">Related Products</h4>
+        <div class="row g-4">
 
-    <div class="row">
+            <?php while ($rel = $relatedProducts->fetch_assoc()): ?>
 
-        <?php while ($rel = $relatedProducts->fetch_assoc()): ?>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card shadow-sm h-100 border-0" style="transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
 
-            <div class="col-md-3 mb-4">
-                <div class="card shadow-sm h-100">
+                        <?php if (!empty($rel['main_image'])): ?>
+                            <img src="uploads/products/<?= $rel['main_image']; ?>"
+                                class="card-img-top p-3 bg-white"
+                                style="height:180px; object-fit:contain;">
+                        <?php endif; ?>
 
-                    <?php if (!empty($rel['main_image'])): ?>
-                        <img src="uploads/products/<?= $rel['main_image']; ?>"
-                            class="card-img-top"
-                            style="height:180px; object-fit:cover;">
-                    <?php endif; ?>
-
-                    <div class="card-body text-center">
-
-                        <h6><?= htmlspecialchars($rel['name']); ?></h6>
-
-                        <a href="product.php?slug=<?= $rel['slug']; ?>"
-                            class="btn btn-danger btn-sm mt-2">
-                            View Product
-                        </a>
+                        <div class="card-body text-center bg-light rounded-bottom">
+                            <h6 class="fw-bold mb-3" style="color: var(--industrial-dark);"><?= htmlspecialchars($rel['name']); ?></h6>
+                            <a href="product.php?slug=<?= $rel['slug']; ?>" class="btn btn-outline-danger btn-sm w-100 fw-semibold">
+                                View Product
+                            </a>
+                        </div>
 
                     </div>
-
                 </div>
-            </div>
 
-        <?php endwhile; ?>
+            <?php endwhile; ?>
 
+        </div>
     </div>
 
 <?php endif; ?>
+
+<!-- JAVASCRIPT FOR AMAZON GALLERY HOVER EFFECT -->
+<script>
+    function changeMainImage(element) {
+        // Change the main image source
+        document.getElementById('mainProductImg').src = element.src;
+        
+        // Remove active red border from all thumbnails
+        let thumbnails = document.querySelectorAll('.amazon-thumbnail');
+        thumbnails.forEach(thumb => thumb.classList.remove('active'));
+        
+        // Add active red border to hovered/clicked thumbnail
+        element.classList.add('active');
+    }
+</script>
+
 <?php include "includes/footer.php"; ?>
