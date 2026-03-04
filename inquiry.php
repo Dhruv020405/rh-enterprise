@@ -93,65 +93,254 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php include "includes/header.php"; ?>
 <?php include "includes/navbar.php"; ?>
 
-<div class="container mt-5">
+<style>
+    /* Industrial Theme Styles */
+    :root {
+        --industrial-dark: #1a252f;
+        --industrial-accent: #dc3545;
+        --industrial-light: #f8f9fa;
+        --industrial-border: #e9ecef;
+    }
+
+    body {
+        background-color: var(--industrial-light);
+    }
+
+    /* Hero Section */
+    .page-hero {
+        background: linear-gradient(135deg, var(--industrial-dark) 0%, #2c3e50 100%);
+        color: #ffffff;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .accent-line {
+        height: 4px;
+        width: 60px;
+        background-color: var(--industrial-accent);
+        border-radius: 2px;
+        margin-top: 12px;
+    }
+
+    /* Form Card Styling */
+    .inquiry-card {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        padding: 3rem 2.5rem;
+    }
+
+    /* Form Controls */
+    .form-label {
+        font-weight: 600;
+        color: var(--industrial-dark);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        background-color: #f8f9fa;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        background-color: #ffffff;
+        border-color: var(--industrial-accent);
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.15);
+    }
+
+    /* Readonly product field */
+    .product-readonly {
+        background-color: rgba(220, 53, 69, 0.05) !important;
+        border-color: rgba(220, 53, 69, 0.2);
+        color: var(--industrial-accent);
+        font-weight: 600;
+        cursor: not-allowed;
+    }
+
+    /* Contact Info Sidebar */
+    .contact-sidebar {
+        background-color: var(--industrial-dark);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 2.5rem;
+        height: 100%;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .contact-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--industrial-accent);
+        flex-shrink: 0;
+    }
+
+    .success-alert {
+        background-color: #d1e7dd;
+        border: 1px solid #badbcc;
+        color: #0f5132;
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+</style>
+
+<!-- HERO SECTION -->
+<div class="page-hero">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="index.php" class="text-white-50 text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item active text-white fw-semibold" aria-current="page">Inquiry</li>
+            </ol>
+        </nav>
+        <h1 class="display-5 fw-bold mb-0">Request a Quote</h1>
+        <div class="accent-line"></div>
+        <p class="mt-4 text-white-50 fs-5 max-w-75">
+            Fill out the form below and our technical sales team will get back to you with pricing and specifications.
+        </p>
+    </div>
+</div>
+
+<div class="container pb-5 mb-5">
 
     <?php if (!empty($success)): ?>
-        <div class="alert alert-success">
-            Thank you! Our team will contact you shortly.
+        <div class="success-alert mb-5 fade show">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+            <div>
+                <h5 class="fw-bold mb-1">Inquiry Submitted Successfully!</h5>
+                <p class="mb-0 text-dark opacity-75">Thank you for reaching out. Our team will review your request and contact you shortly.</p>
+            </div>
         </div>
     <?php endif; ?>
 
-    <div class="card shadow p-4">
-        <h4>Product Inquiry</h4>
+    <div class="row g-5">
+        
+        <!-- LEFT: FORM SECTION -->
+        <div class="col-lg-8">
+            <div class="inquiry-card">
+                <h4 class="fw-bold text-dark mb-4 border-bottom pb-3">Inquiry Details</h4>
 
-        <form method="POST">
+                <form method="POST">
 
-            <!-- Honeypot -->
-            <div style="display:none;">
-                <input type="text" name="website">
+                    <!-- Honeypot -->
+                    <div style="display:none;">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <?php if ($product_id): ?>
+                        <input type="hidden" name="product_id" value="<?= $product_id; ?>">
+                        <input type="hidden" name="product_name" value="<?= htmlspecialchars($product_name); ?>">
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small text-uppercase tracking-wide mb-1">Selected Product</label>
+                            <input type="text" class="form-control product-readonly fs-5"
+                                value="<?= htmlspecialchars($product_name); ?>" readonly>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control" placeholder="john@company.com" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text" name="phone" class="form-control" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" name="company" class="form-control" placeholder="Your Organization Ltd.">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Additional Message / Requirements <span class="text-danger">*</span></label>
+                        <textarea name="message" class="form-control" rows="5" placeholder="Please specify your technical requirements, quantity needed, or any specific questions..." required></textarea>
+                    </div>
+
+                    <button class="btn btn-danger btn-lg px-5 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                        Submit Inquiry
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/></svg>
+                    </button>
+
+                </form>
             </div>
+        </div>
 
-            <?php if ($product_id): ?>
-                <input type="hidden" name="product_id" value="<?= $product_id; ?>">
-                <input type="hidden" name="product_name" value="<?= htmlspecialchars($product_name); ?>">
+        <!-- RIGHT: CONTACT INFO SIDEBAR -->
+        <div class="col-lg-4">
+            <div class="contact-sidebar">
+                <h4 class="fw-bold mb-4">Direct Contact</h4>
+                <div class="accent-line bg-danger mb-5" style="height: 3px; width: 40px;"></div>
 
-                <div class="mb-3">
-                    <label>Product</label>
-                    <input type="text" class="form-control"
-                        value="<?= htmlspecialchars($product_name); ?>" readonly>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Office Address</h6>
+                        <p class="text-white-50 small mb-0 lh-base">
+                            45, Devashray Arcade & Ind. Estate, Nr. Radhey Residency, SP Ring road, Nr. Vinzol Circle, Ramol, Ahmedabad, Gujarat, India.
+                        </p>
+                    </div>
                 </div>
-            <?php endif; ?>
 
-            <div class="mb-3">
-                <label>Your Name</label>
-                <input type="text" name="name" class="form-control" required>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M3 2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V2zm6 11a1 1 0 1 0-2 0 1 1 0 0 0 2 0z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Call Us</h6>
+                        <a href="tel:+919408218427" class="text-white-50 text-decoration-none small d-block mb-1 hover-white">+91 94082 18427</a>
+                        <a href="tel:+917359450751" class="text-white-50 text-decoration-none small d-block hover-white">+91 73594 50751</a>
+                    </div>
+                </div>
+
+                <div class="contact-item mb-0">
+                    <div class="contact-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/></svg>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-white mb-1">Email Us</h6>
+                        <a href="mailto:info@rhentp.in" class="text-white-50 text-decoration-none small d-block mb-1 hover-white">info@rhentp.in</a>
+                        <a href="mailto:purvang.rhenterprise@gmail.com" class="text-white-50 text-decoration-none small d-block hover-white">purvang.rhenterprise@gmail.com</a>
+                    </div>
+                </div>
+
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label>Phone</label>
-                <input type="text" name="phone" class="form-control">
-            </div>
-
-            <div class="mb-3">
-                <label>Company</label>
-                <input type="text" name="company" class="form-control">
-            </div>
-
-            <div class="mb-3">
-                <label>Message</label>
-                <textarea name="message" class="form-control" rows="4" required></textarea>
-            </div>
-
-            <button class="btn btn-danger">Submit Inquiry</button>
-
-        </form>
     </div>
-
 </div>
 
 <?php include "includes/footer.php"; ?>
