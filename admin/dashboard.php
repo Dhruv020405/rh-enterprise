@@ -5,6 +5,20 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 $adminName = $_SESSION['admin_name'] ?? 'Admin';
+
+require_once "../config/database.php";
+
+/* Total Products */
+$result = $conn->query("SELECT COUNT(*) as total FROM products WHERE status = 1");
+$products = $result->fetch_assoc()['total'];
+
+/* Active Categories */
+$result = $conn->query("SELECT COUNT(*) as total FROM categories WHERE status = 1");
+$categories = $result->fetch_assoc()['total'];
+
+/* New Inquiries */
+$result = $conn->query("SELECT COUNT(*) as total FROM inquiries WHERE status = 0");
+$inquiries = $result->fetch_assoc()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -176,7 +190,7 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
                     <div class="card-body">
                         <div>
                             <p class="text-muted mb-1 fw-semibold text-uppercase" style="font-size: 0.85rem;">Total Products</p>
-                            <h3 class="fw-bold mb-0 text-dark">--</h3>
+                            <h3 class="fw-bold mb-0 text-dark"><?= $products ?></h3>
                         </div>
                         <div class="stat-icon bg-primary bg-opacity-10 text-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
@@ -193,7 +207,7 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
                     <div class="card-body">
                         <div>
                             <p class="text-muted mb-1 fw-semibold text-uppercase" style="font-size: 0.85rem;">Active Categories</p>
-                            <h3 class="fw-bold mb-0 text-dark">--</h3>
+                            <h3 class="fw-bold mb-0 text-dark"><?= $categories ?></h3>
                         </div>
                         <div class="stat-icon bg-success bg-opacity-10 text-success">
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
@@ -210,7 +224,7 @@ $adminName = $_SESSION['admin_name'] ?? 'Admin';
                     <div class="card-body">
                         <div>
                             <p class="text-muted mb-1 fw-semibold text-uppercase" style="font-size: 0.85rem;">New Inquiries</p>
-                            <h3 class="fw-bold mb-0 text-dark">--</h3>
+                            <h3 class="fw-bold mb-0 text-dark"><?= $inquiries ?></h3>
                         </div>
                         <div class="stat-icon bg-danger bg-opacity-10 text-danger">
                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
