@@ -6,8 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $name = trim($_POST['name']);
     $type = trim($_POST['type']);
-    $status = intval($_POST['status']);
-    $order = intval($_POST['sort_order']);
+    $status = isset($_POST['status']) ? 1 : 0;
 
     $logo = NULL;
 
@@ -29,6 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         move_uploaded_file($tmp, $uploadDir . $logo);
     }
+
+    /* ---- Auto-calculate Max Sort Order ---- */
+    $orderQuery = $conn->query("SELECT MAX(sort_order) as max_order FROM brand_clients WHERE type = '$type'");
+    $orderRow = $orderQuery->fetch_assoc();
+    $order = ($orderRow['max_order'] !== null) ? $orderRow['max_order'] + 1 : 1;
+
 
     /* ---- Insert Query ---- */
     $stmt = $conn->prepare("
@@ -190,16 +195,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-5">
                                 <label class="form-label" for="entityLogo">Logo Image</label>
                                 <input type="file" name="logo" id="entityLogo" class="form-control bg-light" accept=".jpg,.jpeg,.png,.webp">
                                 <div class="form-text">Recommended formats: PNG with transparent background.</div>
-                            </div>
-
-                            <div class="mb-5">
-                                <label class="form-label" for="sortOrder">Sort Order</label>
-                                <input type="number" name="sort_order" id="sortOrder" class="form-control bg-light w-50" value="0" min="0">
-                                <div class="form-text">Lower numbers appear first. Leave as 0 to use drag-and-drop later.</div>
                             </div>
 
                             <div class="mb-5">

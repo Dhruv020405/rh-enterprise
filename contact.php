@@ -15,9 +15,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ip = $_SERVER['REMOTE_ADDR'];
     $agent = $_SERVER['HTTP_USER_AGENT'];
 
+    /* ===============================
+       STRICT BACKEND VALIDATION
+    =============================== */
     if (!$name || !$email || !$message) {
         $error = "Please fill all required fields.";
+    } elseif (!preg_match("/^[a-zA-Z\s]+$/", $name)) {
+        $error = "Name should only contain letters and spaces. No numbers allowed.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif (!empty($phone) && !preg_match("/^\+?[0-9\s\-]{8,15}$/", $phone)) {
+        $error = "Please enter a valid phone number (8-15 digits).";
     } else {
+        
         $stmt = $conn->prepare("
             INSERT INTO inquiries
             (product_id, product_name, name, email, phone, company, message, ip_address, user_agent)
@@ -217,7 +227,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                            <input type="text" name="name" class="form-control" placeholder="John Doe" required 
+                                   pattern="[a-zA-Z\s]+" title="Name should only contain letters and spaces."
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
@@ -228,7 +240,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Phone Number</label>
-                            <input type="text" name="phone" class="form-control" placeholder="+91 98765 43210">
+                            <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210"
+                                   pattern="^\+?[0-9\s\-]{8,15}$" title="Please enter a valid phone number (8-15 digits)."
+                                   oninput="this.value = this.value.replace(/[^0-9+\s\-]/g, '')">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Company Name</label>

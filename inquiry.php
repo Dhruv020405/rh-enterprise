@@ -21,6 +21,9 @@ if ($product_id) {
     }
 }
 
+$success = false;
+$error = '';
+
 /* ===============================
    FORM SUBMIT
 =============================== */
@@ -40,53 +43,66 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $company = trim($_POST['company']);
     $message = trim($_POST['message']);
 
-    /* Basic Validation */
-    if (strlen($name) < 3) die("Invalid name.");
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) die("Invalid email.");
-    if (strlen($message) < 10) die("Message too short.");
+    /* ===============================
+       STRICT BACKEND VALIDATION
+    =============================== */
+    if (empty($name) || empty($email) || empty($message)) {
+        $error = "Please fill all required fields.";
+    } elseif (!preg_match("/^[a-zA-Z\s]+$/", $name)) {
+        $error = "Name should only contain letters and spaces. No numbers allowed.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif (!empty($phone) && !preg_match("/^\+?[0-9\s\-]{8,15}$/", $phone)) {
+        $error = "Please enter a valid phone number (8-15 digits).";
+    } elseif (strlen($message) < 10) {
+        $error = "Your message is too short. Please provide more details.";
+    } else {
+        
+        /* Rate Limiting */
+        $ip = $_SERVER['REMOTE_ADDR'];
 
-    /* Rate Limiting */
-    $ip = $_SERVER['REMOTE_ADDR'];
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as total 
+            FROM inquiries 
+            WHERE ip_address = ? 
+            AND created_at > (NOW() - INTERVAL 1 MINUTE)
+        ");
+        $stmt->bind_param("s", $ip);
+        $stmt->execute();
+        $count = $stmt->get_result()->fetch_assoc()['total'];
 
-    $stmt = $conn->prepare("
-        SELECT COUNT(*) as total 
-        FROM inquiries 
-        WHERE ip_address = ? 
-        AND created_at > (NOW() - INTERVAL 1 MINUTE)
-    ");
-    $stmt->bind_param("s", $ip);
-    $stmt->execute();
-    $count = $stmt->get_result()->fetch_assoc()['total'];
+        if ($count > 5) {
+            $error = "Too many requests. Please try again later.";
+        } else {
+            /* Insert Inquiry */
+            $stmt = $conn->prepare("
+                INSERT INTO inquiries 
+                (product_id, product_name, name, email, phone, company, message, ip_address, user_agent) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
 
-    if ($count > 5) {
-        die("Too many requests. Try later.");
+            $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+            $stmt->bind_param(
+                "issssssss",
+                $product_id,
+                $product_name,
+                $name,
+                $email,
+                $phone,
+                $company,
+                $message,
+                $ip,
+                $user_agent
+            );
+
+            if ($stmt->execute()) {
+                $success = true;
+            } else {
+                $error = "Something went wrong. Please try again later.";
+            }
+        }
     }
-
-    /* Insert Inquiry */
-    $stmt = $conn->prepare("
-        INSERT INTO inquiries 
-        (product_id, product_name, name, email, phone, company, message, ip_address, user_agent) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
-
-    $stmt->bind_param(
-        "issssssss",
-        $product_id,
-        $product_name,
-        $name,
-        $email,
-        $phone,
-        $company,
-        $message,
-        $ip,
-        $user_agent
-    );
-
-    $stmt->execute();
-
-    $success = true;
 }
 ?>
 
@@ -211,6 +227,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="index.php" class="text-white-50 text-decoration-none">Home</a></li>
+                <li class="breadcrumb-item"><a href="products.php" class="text-white-50 text-decoration-none">Products</a></li>
                 <li class="breadcrumb-item active text-white fw-semibold" aria-current="page">Inquiry</li>
             </ol>
         </nav>
@@ -224,7 +241,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="container pb-5 mb-5">
 
-    <?php if (!empty($success)): ?>
+    <?php if ($success): ?>
         <div class="success-alert mb-5 fade show">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
@@ -233,6 +250,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <h5 class="fw-bold mb-1">Inquiry Submitted Successfully!</h5>
                 <p class="mb-0 text-dark opacity-75">Thank you for reaching out. Our team will review your request and contact you shortly.</p>
             </div>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($error): ?>
+        <div class="alert alert-danger fw-semibold shadow-sm mb-5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            <?= htmlspecialchars($error); ?>
         </div>
     <?php endif; ?>
 
@@ -264,7 +290,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+                            <input type="text" name="name" class="form-control" placeholder="John Doe" required
+                                   pattern="[a-zA-Z\s]+" title="Name should only contain letters and spaces."
+                                   oninput="this.value = this.value.replace(/[^a-zA-Z\s]/g, '')">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Email Address <span class="text-danger">*</span></label>
@@ -275,7 +303,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="row g-4 mb-4">
                         <div class="col-md-6">
                             <label class="form-label">Phone Number</label>
-                            <input type="text" name="phone" class="form-control" placeholder="+91 98765 43210">
+                            <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210"
+                                   pattern="^\+?[0-9\s\-]{8,15}$" title="Please enter a valid phone number (8-15 digits)."
+                                   oninput="this.value = this.value.replace(/[^0-9+\s\-]/g, '')">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Company Name</label>
