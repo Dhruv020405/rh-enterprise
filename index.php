@@ -33,7 +33,7 @@ include "includes/navbar.php";
     /* Hero Section with Premium Industrial Image */
     .hero-section {
         background: linear-gradient(rgba(17, 24, 31, 0.8), rgba(26, 37, 47, 0.85)), 
-                    url('https://images.unsplash.com/photo-1613665813446-82a78c468a1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+                    url('uploads/heroimg.png') center/cover no-repeat;
         min-height: 75vh;
         display: flex;
         align-items: center;
