@@ -181,7 +181,7 @@ include "includes/navbar.php";
                     
                     <!-- Decorative Glass Element -->
                     <div class="position-absolute bottom-0 start-0 text-white p-4 rounded-end-4 mb-5 shadow-lg glass-badge" style="transform: translateX(-20px);">
-                        <h3 class="fw-bold mb-0 display-6">15+</h3>
+                        <h3 class="fw-bold mb-0 display-6">10+</h3>
                         <span class="fw-semibold tracking-wide text-uppercase" style="font-size: 0.85rem;">Years of Excellence</span>
                     </div>
                 </div>

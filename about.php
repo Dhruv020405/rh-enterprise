@@ -103,6 +103,15 @@ include "includes/navbar.php";
     .about-list li {
         margin-bottom: 1rem;
     }
+
+    /* Map Container */
+    .map-container {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
+        height: 400px;
+    }
 </style>
 
 <!-- 1. HERO SECTION -->
@@ -180,7 +189,7 @@ include "includes/navbar.php";
 <section class="py-5 bg-light border-top">
     <div class="container py-5">
         <div class="text-center mb-5">
-            <h2 class="fw-bold display-6" style="color: var(--industrial-dark);">Brands We Partner With</h2>
+            <h2 class="fw-bold display-6" style="color: var(--industrial-dark);">Brands We Channel Partner With</h2>
             <div class="accent-line accent-line-center mb-4"></div>
             <p class="text-secondary fs-5 max-w-75 mx-auto">We are proud channel partners of globally recognized brands, bringing Italian standards and cutting-edge tech to local industries.</p>
         </div>
@@ -254,6 +263,54 @@ include "includes/navbar.php";
             <a href="contact.php" class="btn btn-danger btn-lg px-5 py-3 fw-semibold shadow-sm rounded-pill">
                 Request an Inquiry Today
             </a>
+        </div>
+    </div>
+</section>
+
+<!-- 5. OUR LOCATION (MAP SECTION) -->
+<section class="py-5 bg-light border-top">
+    <div class="container py-5">
+        <div class="row align-items-center g-5">
+            
+            <div class="col-lg-5 pe-lg-5">
+                <h2 class="fw-bold display-6 mb-3" style="color: var(--industrial-dark);">Visit Our Facility</h2>
+                <div class="accent-line mb-4"></div>
+                <p class="text-secondary fs-5 mb-5" style="line-height: 1.7;">
+                    We welcome you to visit our headquarters to discuss your specific industrial and automation requirements with our expert team in person.
+                </p>
+                
+                <div class="d-flex align-items-start gap-3 bg-white p-4 rounded-4 shadow-sm border">
+                    <div class="text-danger mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-2">Corporate Head Office</h5>
+                        <p class="text-muted mb-0" style="line-height: 1.6;">
+                            11-C, Ramdev Estate,<br>
+                            Nr, Siddhapura Estate, Phase IV,<br>
+                            G.I.D.C., Vatva, Ramol Vinzol Road,<br>
+                            Ahmedabad - 382445, (Gujarat), India.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7347.421741011443!2d72.64380193067163!3d22.960872921154664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e8903027a93d1%3A0x27aa0374e2bcf5d!2sR.H%20Enterprise!5e0!3m2!1sen!2sin!4v1772779044269!5m2!1sen!2sin" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>

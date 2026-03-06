@@ -277,10 +277,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div>
                         <h6 class="fw-bold text-dark mb-1">Head Office</h6>
                         <p class="text-muted small mb-0 lh-base">
-                            45, Devashray Arcade & Ind. Estate,<br>
-                            Nr. Radhey Residency, SP Ring road,<br>
-                            Nr. Vinzol Circle, Ramol,<br>
-                            Ahmedabad, Gujarat, India.
+                            11-C, Ramdev Estate,<br>
+                            Nr, Siddhapura Estate, Phase IV,<br>
+                            G.I.D.C., Vatva, Ramol Vinzol Road,<br>
+                            Ahmedabad - 382445, (Gujarat), India.
                         </p>
                     </div>
                 </div>
@@ -310,10 +310,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </div>
 
-            <!-- Google Map Embed -->
+            <!-- Google Map Embed - FIXED -->
             <div class="map-box">
                 <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14690.662205739327!2d72.6465406!3d22.9810141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e86561e1146cd%3A0xc33eab3667104a37!2sRamol%2C%20Ahmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7347.421741011443!2d72.64380193067163!3d22.960872921154664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e8903027a93d1%3A0x27aa0374e2bcf5d!2sR.H%20Enterprise!5e0!3m2!1sen!2sin!4v1772779044269!5m2!1sen!2sin" 
                     width="100%" 
                     height="100%" 
                     style="border:0;" 

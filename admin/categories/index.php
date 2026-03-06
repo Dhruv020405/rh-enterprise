@@ -26,11 +26,20 @@ function displayCategories($parent_id = NULL, $level = 0) {
 
     // If categories exist at this level, output a list container
     if ($result->num_rows > 0) {
-        echo "<ul class='sortable-list list-unstyled mb-0 w-100'>";
+        // Hide subcategory lists by default if level > 0
+        $ulStyle = ($level > 0) ? "display: none;" : "";
+        $ulClass = ($level > 0) ? "nested-ul" : "";
+        
+        echo "<ul class='sortable-list list-unstyled mb-0 w-100 {$ulClass}' style='{$ulStyle}'>";
         
         while ($row = $result->fetch_assoc()) {
             $date = date("M d, Y", strtotime($row['created_at']));
             $indent = $level * 2.5; // Controls the subcategory left-padding (indentation)
+
+            // Check if this specific category has children to determine if we show a toggle arrow
+            $checkSql = "SELECT COUNT(*) as count FROM categories WHERE parent_id = " . intval($row['id']);
+            $checkRes = $conn->query($checkSql);
+            $hasChildren = ($checkRes->fetch_assoc()['count'] > 0);
 
             // Start List Item (Acts as the grouping container for parent + children)
             echo "<li class='category-item w-100' data-id='{$row['id']}'>";
@@ -43,12 +52,23 @@ function displayCategories($parent_id = NULL, $level = 0) {
             echo "<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='currentColor' viewBox='0 0 16 16'><path d='M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z'/></svg>";
             echo "</div>";
 
-            // 2. Category Name (With Dynamic Indentation & Search Hook)
-            echo "<div style='width: 35%; padding-left: {$indent}rem;' class='text-dark fw-semibold cat-name-wrapper'>";
+            // 2. Category Name (With Expand/Collapse Toggle & Search Hook)
+            echo "<div style='width: 35%; padding-left: {$indent}rem;' class='text-dark fw-semibold cat-name-wrapper d-flex align-items-center'>";
+            
+            if ($hasChildren) {
+                // Render Interactive Toggle Arrow
+                echo "<span class='toggle-btn text-muted me-2 d-inline-flex align-items-center justify-content-center hover-accent' style='cursor:pointer; width: 24px; height: 24px; border-radius: 4px; background: rgba(0,0,0,0.04);' onclick='toggleSub(this)' title='Expand/Collapse'>";
+                echo "<svg class='toggle-icon' style='transition: transform 0.2s ease;' xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/></svg>";
+                echo "</span>";
+            } else {
+                // Empty space holder to align items that don't have children
+                echo "<span style='width: 24px; display:inline-block; margin-right: 0.5rem;'></span>";
+            }
+
             if ($level > 0) {
                 echo "<span class='text-muted fw-normal me-2'>↳</span>";
             }
-            // Added cat-name-text class for live search targeting
+            
             echo "<span class='cat-name-text'>" . htmlspecialchars($row['name']) . "</span>";
             echo "</div>";
 
@@ -118,7 +138,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             overflow-x: hidden;
         }
-
+        
         /* Sidebar Base Styling Required for this page layout */
         .sidebar {
             background-color: var(--admin-dark);
@@ -172,6 +192,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
         .nav-link.active svg {
             opacity: 1;
         }
+        
         /* Main Content Layout */
         .main-content {
             margin-left: 260px;
@@ -233,6 +254,11 @@ function displayCategories($parent_id = NULL, $level = 0) {
         .transition-base {
             transition: background-color 0.2s ease;
         }
+        
+        .hover-accent:hover {
+            background-color: var(--admin-accent) !important;
+            color: #ffffff !important;
+        }
 
         /* Sortable States */
         .drag-handle {
@@ -291,7 +317,7 @@ function displayCategories($parent_id = NULL, $level = 0) {
                             <div class="col-md-6 col-lg-7 text-md-end mt-3 mt-md-0">
                                 <div class="text-muted small d-flex align-items-center justify-content-md-end gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/></svg>
-                                    <span id="drag-tip-text">Tip: You can reorder categories by dragging the grip icon.</span>
+                                    <span id="drag-tip-text">Tip: Use the arrow button to reveal subcategories, or drag the grip icon to reorder.</span>
                                 </div>
                             </div>
                         </div>
@@ -334,33 +360,53 @@ function displayCategories($parent_id = NULL, $level = 0) {
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <script>
+    // JS Logic to Handle the Collapse/Expand Subcategories Feature
+    function toggleSub(btn) {
+        const li = btn.closest('.category-item');
+        // Target only the direct nested list inside this specific category row
+        const ul = li.querySelector(':scope > ul.nested-ul');
+        const icon = btn.querySelector('.toggle-icon');
+        
+        if (ul) {
+            if (ul.style.display === 'none' || ul.style.display === '') {
+                ul.style.display = 'block';
+                icon.style.transform = 'rotate(90deg)';
+            } else {
+                ul.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         
-        let sortableInstances = [];
         const nestedSortables = document.querySelectorAll('.sortable-list');
         
         // 1. Initialize Sortable JS
         nestedSortables.forEach(function(el) {
-            let instance = new Sortable(el, {
+            new Sortable(el, {
                 animation: 150,
                 handle: '.drag-handle', // Lock dragging to grip icon
                 fallbackOnBody: true,
                 swapThreshold: 0.65,
                 ghostClass: 'sortable-ghost',
                 
-                onEnd: function () {
+                onEnd: function (evt) {
                     let order = [];
-                    // Collect every category item top-to-bottom sequentially
-                    document.querySelectorAll('.category-item').forEach((row, index) => {
-                        if(row.dataset.id && row.style.display !== 'none') {
+                    // VERY IMPORTANT: Only collect items from the specific list (<ul>) where the drag happened.
+                    let listItems = evt.to.children;
+                    let position = 1;
+
+                    Array.from(listItems).forEach((row) => {
+                        if(row.classList.contains('category-item') && row.dataset.id) {
                             order.push({
                                 id: row.dataset.id,
-                                position: index + 1
+                                position: position++
                             });
                         }
                     });
 
-                    // Push flattened sequence to DB mapping
+                    // Push sequence to DB
                     fetch('update-order.php', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -372,48 +418,59 @@ function displayCategories($parent_id = NULL, $level = 0) {
                     });
                 }
             });
-            sortableInstances.push(instance);
         });
 
-        // 2. Real-Time Category Search Logic
+        // 2. Real-Time Category Search Logic (Auto Expand Tree on Search)
         const searchInput = document.getElementById('categorySearch');
-        const tipText = document.getElementById('drag-tip-text');
         
         searchInput.addEventListener('input', function(e) {
             const term = e.target.value.toLowerCase().trim();
             const items = document.querySelectorAll('.category-item');
 
             if (term === '') {
-                // Search cleared: Show everything, Enable Dragging
+                // Search cleared: Reset back to collapsed state
                 items.forEach(item => item.style.display = '');
-                sortableInstances.forEach(inst => inst.option('disabled', false));
-                tipText.innerHTML = 'Tip: You can reorder categories by dragging the grip icon.';
-                tipText.classList.remove('text-danger');
+                document.querySelectorAll('ul.nested-ul').forEach(ul => ul.style.display = 'none');
+                document.querySelectorAll('.toggle-icon').forEach(icon => icon.style.transform = 'rotate(0deg)');
                 return;
             }
-
-            // Searching: Disable drag-and-drop to prevent data corruption, update text
-            sortableInstances.forEach(inst => inst.option('disabled', true));
-            tipText.innerHTML = 'Drag and drop ordering is temporarily disabled while searching.';
-            tipText.classList.add('text-danger');
 
             // Hide all items first
             items.forEach(item => item.style.display = 'none');
 
-            // Loop and reveal matches and their parents
+            // Loop and reveal matches, their parents, AND their subcategories
             items.forEach(item => {
                 const nameEl = item.querySelector('.cat-name-text');
                 if (nameEl && nameEl.innerText.toLowerCase().includes(term)) {
                     
-                    // Show this item
+                    // Show this matched item
                     item.style.display = '';
                     
-                    // Traverse upwards to make sure all parent categories are visible too
-                    let parent = item.parentElement.closest('.category-item');
-                    while (parent) {
-                        parent.style.display = '';
-                        parent = parent.parentElement.closest('.category-item');
+                    // Traverse UP: Show all parent categories and expand their lists so the tree doesn't break
+                    let parentLi = item.parentElement.closest('.category-item');
+                    while (parentLi) {
+                        parentLi.style.display = '';
+                        
+                        let nestedUl = parentLi.querySelector(':scope > ul.nested-ul');
+                        if (nestedUl) {
+                            nestedUl.style.display = 'block';
+                        }
+                        
+                        let icon = parentLi.querySelector(':scope > .table-row .toggle-icon');
+                        if(icon) icon.style.transform = 'rotate(90deg)';
+
+                        parentLi = parentLi.parentElement.closest('.category-item');
                     }
+
+                    // Traverse DOWN: Show all subcategories inside this matched item and expand them
+                    const childrenLis = item.querySelectorAll('.category-item');
+                    childrenLis.forEach(child => child.style.display = '');
+                    
+                    const childrenUls = item.querySelectorAll('ul.nested-ul');
+                    childrenUls.forEach(ul => ul.style.display = 'block');
+                    
+                    const childrenIcons = item.querySelectorAll('.toggle-icon');
+                    childrenIcons.forEach(icon => icon.style.transform = 'rotate(90deg)');
                 }
             });
         });
